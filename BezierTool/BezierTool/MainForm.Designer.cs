@@ -61,16 +61,17 @@
             this.rbFileOutput = new System.Windows.Forms.RadioButton();
             this.rbScreenOutput = new System.Windows.Forms.RadioButton();
             this.panel_bottom = new System.Windows.Forms.Panel();
+            this.nudZoom = new System.Windows.Forms.NumericUpDown();
             this.btnDefault = new System.Windows.Forms.Button();
-            this.btnZoomOut = new System.Windows.Forms.Button();
-            this.btnZoomIn = new System.Windows.Forms.Button();
+            this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
             this.btnDeleteCurve = new System.Windows.Forms.Button();
             this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnChangeColor = new System.Windows.Forms.Button();
             this.pnlCanva = new System.Windows.Forms.Panel();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.cbShowcPoints = new System.Windows.Forms.CheckBox();
+            this.lblZoom = new System.Windows.Forms.Label();
+            this.pnlMessage = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pbCanva)).BeginInit();
             this.groupAddInputType.SuspendLayout();
             this.groupAddType.SuspendLayout();
@@ -80,8 +81,10 @@
             this.groupGetCoordinates.SuspendLayout();
             this.groupOutput.SuspendLayout();
             this.panel_bottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudZoom)).BeginInit();
             this.panel_tools.SuspendLayout();
             this.pnlCanva.SuspendLayout();
+            this.pnlMessage.SuspendLayout();
             this.SuspendLayout();
             // 
             // pbCanva
@@ -89,7 +92,7 @@
             this.pbCanva.BackColor = System.Drawing.SystemColors.Window;
             this.pbCanva.Location = new System.Drawing.Point(3, 3);
             this.pbCanva.Name = "pbCanva";
-            this.pbCanva.Size = new System.Drawing.Size(1091, 997);
+            this.pbCanva.Size = new System.Drawing.Size(1071, 969);
             this.pbCanva.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbCanva.TabIndex = 0;
             this.pbCanva.TabStop = false;
@@ -100,9 +103,9 @@
             // 
             // btnUploadBackground
             // 
-            this.btnUploadBackground.Location = new System.Drawing.Point(6, 3);
+            this.btnUploadBackground.Location = new System.Drawing.Point(9, 587);
             this.btnUploadBackground.Name = "btnUploadBackground";
-            this.btnUploadBackground.Size = new System.Drawing.Size(317, 36);
+            this.btnUploadBackground.Size = new System.Drawing.Size(314, 37);
             this.btnUploadBackground.TabIndex = 1;
             this.btnUploadBackground.Text = "Upload Background Image";
             this.btnUploadBackground.UseVisualStyleBackColor = true;
@@ -110,9 +113,9 @@
             // 
             // btnResetAll
             // 
-            this.btnResetAll.Location = new System.Drawing.Point(177, 108);
+            this.btnResetAll.Location = new System.Drawing.Point(168, 3);
             this.btnResetAll.Name = "btnResetAll";
-            this.btnResetAll.Size = new System.Drawing.Size(146, 37);
+            this.btnResetAll.Size = new System.Drawing.Size(159, 37);
             this.btnResetAll.TabIndex = 2;
             this.btnResetAll.Text = "Reset All";
             this.btnResetAll.UseVisualStyleBackColor = true;
@@ -193,17 +196,17 @@
             // lblError
             // 
             this.lblError.AutoSize = true;
-            this.lblError.ForeColor = System.Drawing.Color.Red;
-            this.lblError.Location = new System.Drawing.Point(12, 1021);
+            this.lblError.ForeColor = System.Drawing.Color.Black;
+            this.lblError.Location = new System.Drawing.Point(3, 1);
             this.lblError.Name = "lblError";
-            this.lblError.Size = new System.Drawing.Size(107, 20);
+            this.lblError.Size = new System.Drawing.Size(86, 20);
             this.lblError.TabIndex = 12;
-            this.lblError.Text = "errorMessage";
+            this.lblError.Text = "Messages:";
             // 
             // cbShowBackground
             // 
             this.cbShowBackground.AutoSize = true;
-            this.cbShowBackground.Location = new System.Drawing.Point(6, 45);
+            this.cbShowBackground.Location = new System.Drawing.Point(9, 629);
             this.cbShowBackground.Name = "cbShowBackground";
             this.cbShowBackground.Size = new System.Drawing.Size(165, 24);
             this.cbShowBackground.TabIndex = 13;
@@ -435,53 +438,72 @@
             // 
             // panel_bottom
             // 
-            this.panel_bottom.Controls.Add(this.cbShowcPoints);
             this.panel_bottom.Controls.Add(this.btnDefault);
-            this.panel_bottom.Controls.Add(this.btnZoomOut);
             this.panel_bottom.Controls.Add(this.btnResetAll);
-            this.panel_bottom.Controls.Add(this.btnZoomIn);
-            this.panel_bottom.Controls.Add(this.cbShowBackground);
-            this.panel_bottom.Controls.Add(this.btnUploadBackground);
-            this.panel_bottom.Location = new System.Drawing.Point(1118, 867);
+            this.panel_bottom.Location = new System.Drawing.Point(1118, 960);
             this.panel_bottom.Name = "panel_bottom";
-            this.panel_bottom.Size = new System.Drawing.Size(330, 151);
+            this.panel_bottom.Size = new System.Drawing.Size(327, 50);
             this.panel_bottom.TabIndex = 31;
+            // 
+            // nudZoom
+            // 
+            this.nudZoom.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudZoom.Location = new System.Drawing.Point(1363, -2);
+            this.nudZoom.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this.nudZoom.Minimum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudZoom.Name = "nudZoom";
+            this.nudZoom.Size = new System.Drawing.Size(59, 26);
+            this.nudZoom.TabIndex = 38;
+            this.nudZoom.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.nudZoom.ValueChanged += new System.EventHandler(this.nudZoom_ValueChanged);
             // 
             // btnDefault
             // 
-            this.btnDefault.Location = new System.Drawing.Point(6, 108);
+            this.btnDefault.Location = new System.Drawing.Point(0, 3);
             this.btnDefault.Name = "btnDefault";
-            this.btnDefault.Size = new System.Drawing.Size(152, 37);
+            this.btnDefault.Size = new System.Drawing.Size(165, 37);
             this.btnDefault.TabIndex = 35;
             this.btnDefault.Text = "Form Default";
             this.btnDefault.UseVisualStyleBackColor = true;
             this.btnDefault.Click += new System.EventHandler(this.btnDefault_Click);
             // 
-            // btnZoomOut
+            // cbShowcPoints
             // 
-            this.btnZoomOut.Location = new System.Drawing.Point(248, 45);
-            this.btnZoomOut.Name = "btnZoomOut";
-            this.btnZoomOut.Size = new System.Drawing.Size(36, 37);
-            this.btnZoomOut.TabIndex = 34;
-            this.btnZoomOut.Text = "-";
-            this.btnZoomOut.UseVisualStyleBackColor = true;
-            this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
-            // 
-            // btnZoomIn
-            // 
-            this.btnZoomIn.Location = new System.Drawing.Point(287, 45);
-            this.btnZoomIn.Name = "btnZoomIn";
-            this.btnZoomIn.Size = new System.Drawing.Size(36, 37);
-            this.btnZoomIn.TabIndex = 33;
-            this.btnZoomIn.Text = "+";
-            this.btnZoomIn.UseVisualStyleBackColor = true;
-            this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
+            this.cbShowcPoints.AutoSize = true;
+            this.cbShowcPoints.Checked = true;
+            this.cbShowcPoints.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbShowcPoints.Location = new System.Drawing.Point(192, 629);
+            this.cbShowcPoints.Name = "cbShowcPoints";
+            this.cbShowcPoints.Size = new System.Drawing.Size(131, 24);
+            this.cbShowcPoints.TabIndex = 36;
+            this.cbShowcPoints.Text = "Show cPoints";
+            this.cbShowcPoints.UseVisualStyleBackColor = true;
+            this.cbShowcPoints.CheckedChanged += new System.EventHandler(this.cbShowcPoints_CheckedChanged);
             // 
             // panel_tools
             // 
+            this.panel_tools.Controls.Add(this.cbShowcPoints);
+            this.panel_tools.Controls.Add(this.btnUploadBackground);
             this.panel_tools.Controls.Add(this.btnDeleteCurve);
             this.panel_tools.Controls.Add(this.groupAddType);
             this.panel_tools.Controls.Add(this.pnlLastColor);
+            this.panel_tools.Controls.Add(this.cbShowBackground);
             this.panel_tools.Controls.Add(this.groupAddInputType);
             this.panel_tools.Controls.Add(this.groupParamType);
             this.panel_tools.Controls.Add(this.groupModifyType);
@@ -491,7 +513,7 @@
             this.panel_tools.Controls.Add(this.groupGetCoordinates);
             this.panel_tools.Location = new System.Drawing.Point(1115, 13);
             this.panel_tools.Name = "panel_tools";
-            this.panel_tools.Size = new System.Drawing.Size(330, 591);
+            this.panel_tools.Size = new System.Drawing.Size(330, 668);
             this.panel_tools.TabIndex = 32;
             // 
             // btnDeleteCurve
@@ -525,32 +547,41 @@
             // 
             // pnlCanva
             // 
+            this.pnlCanva.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pnlCanva.Controls.Add(this.pbCanva);
             this.pnlCanva.Location = new System.Drawing.Point(12, 12);
             this.pnlCanva.Name = "pnlCanva";
-            this.pnlCanva.Size = new System.Drawing.Size(1097, 1003);
+            this.pnlCanva.Size = new System.Drawing.Size(1097, 998);
             this.pnlCanva.TabIndex = 35;
             // 
-            // cbShowcPoints
+            // lblZoom
             // 
-            this.cbShowcPoints.AutoSize = true;
-            this.cbShowcPoints.Checked = true;
-            this.cbShowcPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbShowcPoints.Location = new System.Drawing.Point(6, 75);
-            this.cbShowcPoints.Name = "cbShowcPoints";
-            this.cbShowcPoints.Size = new System.Drawing.Size(131, 24);
-            this.cbShowcPoints.TabIndex = 36;
-            this.cbShowcPoints.Text = "Show cPoints";
-            this.cbShowcPoints.UseVisualStyleBackColor = true;
-            this.cbShowcPoints.CheckedChanged += new System.EventHandler(this.cbShowcPoints_CheckedChanged);
+            this.lblZoom.AutoSize = true;
+            this.lblZoom.Location = new System.Drawing.Point(1303, 1);
+            this.lblZoom.Name = "lblZoom";
+            this.lblZoom.Size = new System.Drawing.Size(54, 20);
+            this.lblZoom.TabIndex = 39;
+            this.lblZoom.Text = "Zoom:";
+            // 
+            // pnlMessage
+            // 
+            this.pnlMessage.BackColor = System.Drawing.SystemColors.Control;
+            this.pnlMessage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlMessage.Controls.Add(this.lblError);
+            this.pnlMessage.Controls.Add(this.lblZoom);
+            this.pnlMessage.Controls.Add(this.nudZoom);
+            this.pnlMessage.Location = new System.Drawing.Point(12, 1016);
+            this.pnlMessage.Name = "pnlMessage";
+            this.pnlMessage.Size = new System.Drawing.Size(1429, 28);
+            this.pnlMessage.TabIndex = 40;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1450, 1050);
+            this.ClientSize = new System.Drawing.Size(1450, 1053);
+            this.Controls.Add(this.pnlMessage);
             this.Controls.Add(this.pnlCanva);
-            this.Controls.Add(this.lblError);
             this.Controls.Add(this.panel_tools);
             this.Controls.Add(this.panel_bottom);
             this.Name = "FormMain";
@@ -569,11 +600,13 @@
             this.groupOutput.ResumeLayout(false);
             this.groupOutput.PerformLayout();
             this.panel_bottom.ResumeLayout(false);
-            this.panel_bottom.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudZoom)).EndInit();
             this.panel_tools.ResumeLayout(false);
+            this.panel_tools.PerformLayout();
             this.pnlCanva.ResumeLayout(false);
+            this.pnlMessage.ResumeLayout(false);
+            this.pnlMessage.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -615,13 +648,14 @@
         private System.Windows.Forms.RadioButton rbCentripetal;
         private System.Windows.Forms.Button btnDeleteCurve;
         private System.Windows.Forms.Panel pnlCanva;
-        private System.Windows.Forms.Button btnZoomOut;
-        private System.Windows.Forms.Button btnZoomIn;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Panel pnlLastColor;
         private System.Windows.Forms.Button btnChangeColor;
         private System.Windows.Forms.Button btnDefault;
         private System.Windows.Forms.CheckBox cbShowcPoints;
+        private System.Windows.Forms.NumericUpDown nudZoom;
+        private System.Windows.Forms.Label lblZoom;
+        private System.Windows.Forms.Panel pnlMessage;
     }
 }
 

@@ -71,11 +71,6 @@ namespace BezierTool
             InitializeComponent();
             this.Width = Convert.ToInt32(0.75 * Screen.PrimaryScreen.Bounds.Width);
             this.Height = Convert.ToInt32(0.75 * Screen.PrimaryScreen.Bounds.Height);
-            lblError.Text = "";
-            
-            pnlCanva.AutoScroll = false;
-            pnlCanva.VerticalScroll.Visible = false;
-            pnlCanva.AutoScroll = true;
         }
 
 
@@ -84,24 +79,28 @@ namespace BezierTool
         // for dragging points with mouse or for selecting a curve to output its point coordinates
         private void pbCanva_MouseDown(object sender, MouseEventArgs e)
         {
+            Point eZoom = new Point();
+            eZoom.X = Convert.ToInt32(e.X / zoomAmount);
+            eZoom.Y = Convert.ToInt32(e.Y / zoomAmount);
+
             // addding a new control point with mouse for <4 cPoints> curve
             if (addType == BezierType.cPoints && rbMouseInput.Checked == true)
             {
-                AddcPoint(e.Location);
+                AddcPoint(eZoom);
                 pbCanva.Invalidate();
             }
 
             // adding a new point with mouse for  <4 pPoints>, <Least Squares> or <Composite> curve
             else if ((addType == BezierType.pPoints || addType == BezierType.LeastSquares || addType == BezierType.Composite) && rbMouseInput.Checked == true)
             {
-                AddpPoint(e.Location);
+                AddpPoint(eZoom);
                 pbCanva.Invalidate();
             }
 
             // dragging a control point with mouse
             if (cPointsAll != null && modifyPointType == BezierType.cPoints)
             {
-                FindLocalPoint(cPointsAll, e.Location);
+                FindLocalPoint(cPointsAll, eZoom);
 
                 if (localPoint != null)
                 {
@@ -113,7 +112,7 @@ namespace BezierTool
             // dragging a knot point with mouse
             if (pPointsAll != null && modifyPointType == BezierType.pPoints)
             {
-                FindLocalPoint(pPointsAll, e.Location);
+                FindLocalPoint(pPointsAll, eZoom);
 
                 if (localPoint != null)
                 {
@@ -125,7 +124,7 @@ namespace BezierTool
             // changing parametrization method of a drawn curve
             if (cPointsAll != null && canChangeParam == true && isChangingParam == false)
             {
-                FindLocalPoint(cPointsAll, e.Location);
+                FindLocalPoint(cPointsAll, eZoom);
 
                 if (localPoint != null)
                 {
@@ -137,7 +136,7 @@ namespace BezierTool
             // outputting control point coordinates
             if (cPointsAll != null && outputPointType == BezierType.cPoints)
             {
-                FindLocalPoint(cPointsAll, e.Location);
+                FindLocalPoint(cPointsAll, eZoom);
 
                 if (localPoint == null)
                 {
@@ -169,7 +168,7 @@ namespace BezierTool
             // outputting knot point coordinates
             if (pPointsAll != null && outputPointType == BezierType.pPoints)
             {
-                FindLocalPoint(pPointsAll, e.Location);
+                FindLocalPoint(pPointsAll, eZoom);
 
                 if (localPoint == null)
                 {
@@ -200,7 +199,7 @@ namespace BezierTool
 
             if (cPointsAll != null && canChangeColor == true)
             {
-                FindLocalPoint(cPointsAll, e.Location);
+                FindLocalPoint(cPointsAll, eZoom);
 
                 if (localPoint == null)
                 {
@@ -220,7 +219,7 @@ namespace BezierTool
             // deleting a curve
             if (cPointsAll != null && canDeleteCurve == true)
             {
-                FindLocalPoint(cPointsAll, e.Location);
+                FindLocalPoint(cPointsAll, eZoom);
 
                 if (localPoint != null)
                 {
@@ -236,10 +235,14 @@ namespace BezierTool
         // for for modifying points of a curve by mouse.
         private void pbCanva_MouseMove(object sender, MouseEventArgs e)
         {
+            Point eZoom = new Point();
+            eZoom.X = Convert.ToInt32(e.X / zoomAmount);
+            eZoom.Y = Convert.ToInt32(e.Y / zoomAmount);
+
             // get the new control point coordines for <4 cPoints> curve
             if (addType == BezierType.cPoints)
             {
-                cPointNew = e.Location;
+                cPointNew = eZoom;
                 pbCanva.Invalidate();
             }
 
@@ -256,14 +259,14 @@ namespace BezierTool
             // when modifiying <4 cPoints> curve, we can just change point coordinets
             if (modifyCurveType == BezierType.cPoints)
             {
-                cPointsAll[i][j] = e.Location;
+                cPointsAll[i][j] = eZoom;
                 pbCanva.Invalidate();
             }
 
             // when modifiying knot points of <4 pPoints> or <Least Squares> curves, we need to re-calculates control points of the curve
             else if ((modifyCurveType == BezierType.pPoints || modifyCurveType == BezierType.LeastSquares) && modifyPointType == BezierType.pPoints)
             {
-                pPointsAll[i][j] = e.Location;
+                pPointsAll[i][j] = eZoom;
                 AddcPointsInterpolation(i);
                 pbCanva.Invalidate();
             }
@@ -275,7 +278,7 @@ namespace BezierTool
                 // aswell - to maintain continuity
                 if (movedCurve[i] == MoveType.LeftClick)
                 {
-                    cPointsAll[i][j] = e.Location;
+                    cPointsAll[i][j] = eZoom;
 
                     //starting from the fifth control point, every third point's opposite control point is two points before
                     if (j % 3 == 1 && j != 1)
@@ -298,13 +301,13 @@ namespace BezierTool
                     //starting from the fifth control point, every third point's opposite control point is two points before
                     if (j % 3 == 1 && j != 1)
                     {
-                        ModifyHandleCompositeStraight(e.Location, cPointsAll[i][j - 1], cPointsAll[i][j - 2]);
+                        ModifyHandleCompositeStraight(eZoom, cPointsAll[i][j - 1], cPointsAll[i][j - 2]);
                     }
 
                     //starting from the third control point, every third point's opposite control point is two points after
                     if (j % 3 == 2 && j != cPointsAll[i].Count - 2)
                     {
-                        ModifyHandleCompositeStraight(e.Location, cPointsAll[i][j + 1], cPointsAll[i][j + 2]);
+                        ModifyHandleCompositeStraight(eZoom, cPointsAll[i][j + 1], cPointsAll[i][j + 2]);
                     }
                 }
                 pbCanva.Invalidate();
@@ -313,7 +316,7 @@ namespace BezierTool
             // when modifiying knot points of <Composite> curves, we need to re-calculates control points of the curve 
             else if (modifyCurveType == BezierType.Composite && modifyPointType == BezierType.pPoints)
             {
-                ModifypPointComposite(e.Location);
+                ModifypPointComposite(eZoom);
                 
                 movedCurve[i] = MoveType.pPoints;
                 pbCanva.Invalidate();
@@ -334,9 +337,13 @@ namespace BezierTool
         }
 
 
+        //???
         private void MakeZoomLists()
         {
             Point tmp = new Point();
+            dPointsZoom = new List<Point>();
+            cPointsZoom = new List<List<Point>>();
+            pPointsZoom = new List<List<Point>>();
 
             if (DefaultForm.dPoints != null)
             {
@@ -346,32 +353,48 @@ namespace BezierTool
                     tmp.Y = Convert.ToInt32(DefaultForm.dPoints[i].Y * zoomAmount);
                     dPointsZoom.Add(tmp);
                 }
+            }
 
+            if (cPointsAll != null)
+            {
                 for (int i = 0; i < cPointsAll.Count; i++)
                 {
-                    cPointsZoom.Add(null);
-                    for (int j = 0; j< cPointsAll[i].Count; j++)
+                    List<Point> cList = new List<Point>();
+                    cPointsZoom.Add(cList);
+                    if (cPointsAll[i] != null)
                     {
-                        tmp.X = Convert.ToInt32(cPointsAll[i][j].X * zoomAmount);
-                        tmp.Y = Convert.ToInt32(cPointsAll[i][j].Y * zoomAmount);
-                        cPointsZoom[i].Add(tmp);
+                        for (int j = 0; j < cPointsAll[i].Count; j++)
+                        {
+                            tmp.X = Convert.ToInt32(cPointsAll[i][j].X * zoomAmount);
+                            tmp.Y = Convert.ToInt32(cPointsAll[i][j].Y * zoomAmount);
+                            cPointsZoom[i].Add(tmp);
+                        }
                     }
                 }
+            }
 
+
+            if (pPointsAll != null)
+            {
                 for (int i = 0; i < pPointsAll.Count; i++)
                 {
-                    pPointsZoom.Add(null);
-                    for (int j = 0; j < pPointsAll[i].Count; j++)
+                    List<Point> pList = new List<Point>();
+                    pPointsZoom.Add(pList);
+                    if (pPointsAll[i] != null)
                     {
-                        tmp.X = Convert.ToInt32(pPointsAll[i][j].X * zoomAmount);
-                        tmp.Y = Convert.ToInt32(pPointsAll[i][j].Y * zoomAmount);
-                        pPointsZoom[i].Add(tmp);
+                        for (int j = 0; j < pPointsAll[i].Count; j++)
+                        {
+                            tmp.X = Convert.ToInt32(pPointsAll[i][j].X * zoomAmount);
+                            tmp.Y = Convert.ToInt32(pPointsAll[i][j].Y * zoomAmount);
+                            pPointsZoom[i].Add(tmp);
+                        }
                     }
                 }
-
-                return;
             }
+
+            return;
         }
+
 
         // Draws all graphics in this programm - points, control point polygons, all bezier curves,
         // as well as calling for functions to get needed control points.
@@ -398,11 +421,12 @@ namespace BezierTool
             {
                 Width = DefaultForm.curveSize
             };
-            
+
+            MakeZoomLists();
 
             if (DefaultForm.dPoints != null)
             {
-                foreach (Point dPoint in DefaultForm.dPoints)
+                foreach (Point dPoint in dPointsZoom)
                 {
                     e.Graphics.FillEllipse(dPointBrush, dPoint.X - pointRadius, dPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                 }
@@ -433,7 +457,7 @@ namespace BezierTool
                     // draw a black point for every point
                     if (cbShowcPoints.Checked == true)
                     {
-                        foreach (Point pPoint in pPointsAll[i])
+                        foreach (Point pPoint in pPointsZoom[i])
                         {
                             e.Graphics.FillEllipse(pPointBrush, pPoint.X - pointRadius, pPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                         }
@@ -470,6 +494,7 @@ namespace BezierTool
                 }
             }
 
+            MakeZoomLists();
 
             // go through all lists of control points
             for (int i = 0; i < cPointsAll.Count; i++)
@@ -482,7 +507,7 @@ namespace BezierTool
                     // for <4 cPoints> and <Least Squares> curves draw all control points
                     if ((allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares) && cbShowcPoints.Checked == true)
                     {
-                        foreach (Point cPoint in cPointsAll[i])
+                        foreach (Point cPoint in cPointsZoom[i])
                         {
                             e.Graphics.DrawEllipse(cPointBrush, cPoint.X - pointRadius, cPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                         }
@@ -491,8 +516,8 @@ namespace BezierTool
                     //for <4 pPoints> curves draw only middle control points, because end are also points knot points
                     else if (allCurves[i] == BezierType.pPoints && cbShowcPoints.Checked == true)
                     {
-                        e.Graphics.DrawEllipse(cPointBrush, cPointsAll[i][1].X - pointRadius, cPointsAll[i][1].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
-                        e.Graphics.DrawEllipse(cPointBrush, cPointsAll[i][2].X - pointRadius, cPointsAll[i][2].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
+                        e.Graphics.DrawEllipse(cPointBrush, cPointsZoom[i][1].X - pointRadius, cPointsZoom[i][1].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
+                        e.Graphics.DrawEllipse(cPointBrush, cPointsZoom[i][2].X - pointRadius, cPointsZoom[i][2].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                     }
 
                     // for <Composite> curves draw only those control points which are not knot points -
@@ -503,7 +528,7 @@ namespace BezierTool
                         {
                             if (j % 3 != 2)
                             {
-                                e.Graphics.DrawEllipse(cPointBrush, cPointsAll[i][j + 1].X - pointRadius, cPointsAll[i][j + 1].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
+                                e.Graphics.DrawEllipse(cPointBrush, cPointsZoom[i][j + 1].X - pointRadius, cPointsZoom[i][j + 1].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                             }
                         }
                     }
@@ -513,7 +538,7 @@ namespace BezierTool
 
                     if (cPointsAll[i].Count > 1 && cbShowcPoints.Checked == true && (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.pPoints))
                     {
-                        e.Graphics.DrawLines(polygonBrush, cPointsAll[i].ToArray());
+                        e.Graphics.DrawLines(polygonBrush, cPointsZoom[i].ToArray());
                     }
 
                     //for <Composite> curves, draw only handle lines
@@ -525,7 +550,7 @@ namespace BezierTool
                             //exept every third starting from first and the last
                             if (j % 3 != 1)
                             {
-                                e.Graphics.DrawLine(polygonBrush, cPointsAll[i][j], cPointsAll[i][j + 1]);
+                                e.Graphics.DrawLine(polygonBrush, cPointsZoom[i][j], cPointsZoom[i][j + 1]);
                             }
                         }
                     }
@@ -538,7 +563,7 @@ namespace BezierTool
                     // <4 cPoints>, <4 pPoints> and <Least Squares> curves have 4 control points
                     if (cPointsAll[i].Count == 4 && (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.pPoints))
                     {
-                        e.Graphics.DrawBezier(bezierPen, cPointsAll[i][0], cPointsAll[i][1], cPointsAll[i][2], cPointsAll[i][3]);
+                        e.Graphics.DrawBezier(bezierPen, cPointsZoom[i][0], cPointsZoom[i][1], cPointsZoom[i][2], cPointsZoom[i][3]);
                     }
 
                     // draw each segment of <Composite> curve
@@ -546,9 +571,10 @@ namespace BezierTool
                     {
                         for (int j = 0; j < cPointsAll[i].Count - 3; j += 3)
                         {
-                            e.Graphics.DrawBezier(bezierPen, cPointsAll[i][j], cPointsAll[i][j + 1], cPointsAll[i][j + 2], cPointsAll[i][j + 3]);
+                            e.Graphics.DrawBezier(bezierPen, cPointsZoom[i][j], cPointsZoom[i][j + 1], cPointsZoom[i][j + 2], cPointsZoom[i][j + 3]);
                         }
                     }
+
                 }
             }
         }
@@ -560,20 +586,24 @@ namespace BezierTool
             int formWidth = this.Width;
             int formHeight = this.Height;
 
-            // 20px, 35 px, 55px, 65px are used to make margins
+            // px values are used to make margins
             panel_tools.Left = formWidth - panel_tools.Width - 20; 
-            panel_bottom.Left = formWidth - panel_bottom.Width - 20;
-            panel_bottom.Top = formHeight - panel_bottom.Height - 55;
+            panel_bottom.Left = formWidth - panel_bottom.Width - 25;
+            panel_bottom.Top = formHeight - panel_bottom.Height - 65;
             pnlCanva.Width = formWidth - panel_tools.Width - 35;
-            pnlCanva.Height = formHeight - 65;
-            pbCanva.Width = pnlCanva.Width-10;
-            pbCanva.Height = pnlCanva.Height-10;
-            lblError.Top = formHeight - 55;
+            pnlCanva.Height = formHeight - 75;
+            pbCanva.Width = pnlCanva.Width;
+            pbCanva.Height = pnlCanva.Height;
+            pnlMessage.Top = formHeight - 65;
+            pnlMessage.Width = formWidth - 30;
+            nudZoom.Left = pnlMessage.Width - 45;
+            lblZoom.Left = pnlMessage.Width - 80;
         }
 
 
         // Zoom in and out of pbCanva. If zoom == true zoom in, if zoom == false, zoom out.
         //Change all point coordinets according to zoom.
+        // ??? nevajag
         private void ZoomCanva(bool zoom)
         {
             double zoomRatio = 1.1;
@@ -588,45 +618,11 @@ namespace BezierTool
 
             zoomAmount *= zoomRatio;
             
-            if (cPointsAll != null)
-            {
-                for (int i = 0; i < cPointsAll.Count; i++)
-                {
-                    if (cPointsAll[i] != null)
-                    {
-                        for (int j = 0; j < cPointsAll[i].Count; j++)
-                        {
-                            Point tmp = new Point();
-                            tmp.X = Convert.ToInt32(cPointsAll[i][j].X * zoomRatio);
-                            tmp.Y = Convert.ToInt32(cPointsAll[i][j].Y * zoomRatio);
-                            cPointsAll[i][j] = tmp;
-                        }
-                    }
-                }
-
-            }
-
-            if (pPointsAll != null)
-            {
-                for (int i = 0; i < pPointsAll.Count; i++)
-                {
-                    if (pPointsAll[i] != null)
-                    {
-                        for (int j = 0; j < pPointsAll[i].Count; j++)
-                        {
-                            Point tmp = new Point();
-                            tmp.X = Convert.ToInt32(pPointsAll[i][j].X * zoomRatio);
-                            tmp.Y = Convert.ToInt32(pPointsAll[i][j].Y * zoomRatio);
-                            pPointsAll[i][j] = tmp;
-                        }
-                    }
-                }
-            }
-            
             return;
         }
 
 
+        // ???
         private void ButtonPress()
         {
             lblError.Text = "";
@@ -641,6 +637,7 @@ namespace BezierTool
             outputPointType = BezierType.Nothing;
 
         }
+
 
         // Zoom out of pbCanva.
         private void btnZoomOut_Click(object sender, EventArgs e)
@@ -735,7 +732,8 @@ namespace BezierTool
 
                 if (cPoints.Count != 4)
                 {
-                    lblError.Text = ".txt file was not correct!";
+                    lblError.ForeColor = Color.Red;
+                    lblError.Text = "Error: .txt file was not correct!";
                     return;
                 }
 
@@ -781,7 +779,8 @@ namespace BezierTool
 
                 if (pPoints.Count != 4)
                 {
-                    lblError.Text = ".txt file was not correct!";
+                    lblError.ForeColor = Color.Red;
+                    lblError.Text = "Error: .txt file was not correct!";
                     return;
                 }
 
@@ -827,7 +826,8 @@ namespace BezierTool
 
                 if (pPoints.Count < 4 || pPoints.Count > maxPointCount)
                 {
-                    lblError.Text = ".txt file was not correct!";
+                    lblError.ForeColor = Color.Red;
+                    lblError.Text = "Error: .txt file was not correct!";
                     DeleteCurve(allCurves.Count - 1);  // reverse the actions of newCurve() function
                     return;
                 }
@@ -876,7 +876,8 @@ namespace BezierTool
 
                 if (pPoints.Count < 2 || pPoints.Count > maxPointCount)
                 {
-                    lblError.Text = ".txt file was not correct!";
+                    lblError.ForeColor = Color.Red;
+                    lblError.Text = "Error: .txt file was not correct!";
                     DeleteCurve(allCurves.Count - 1);  // reverse the actions of newCurve() function
                     return;
                 }
@@ -1358,7 +1359,8 @@ namespace BezierTool
 
             if (modifyCurveType == BezierType.pPoints || modifyCurveType == BezierType.LeastSquares)
             {
-                lblError.Text = "Not allowed to move control points of <" + modifyCurveType + "> curve!";
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: Not allowed to move control points of <" + modifyCurveType + "> curve!";
                 modifyCurveType = BezierType.Nothing;
                 localPoint = null;
             }
@@ -1367,7 +1369,8 @@ namespace BezierTool
             {
                 if (rbKeyboardModify.Checked == true)
                 {
-                    lblError.Text = "Not allowed to move control points of <Composite> curve by keyboard!";
+                    lblError.ForeColor = Color.Red;
+                    lblError.Text = "Error: Not allowed to move control points of <Composite> curve by keyboard!";
                     localPoint = null;
                     modifyCurveType = BezierType.Nothing;
                 }
@@ -1542,7 +1545,8 @@ namespace BezierTool
 
             if (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.Composite)
             {
-                lblError.Text = "<" + allCurves[i] + "> curves does not use parametrization!";
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: <" + allCurves[i] + "> curves does not use parametrization!";
                 return;
             }
 
@@ -1820,7 +1824,8 @@ namespace BezierTool
 
                         catch (Exception)
                         {
-                            lblError.Text = ".txt file was not correct!";
+                            lblError.ForeColor = Color.Red;
+                            lblError.Text = "Error: .txt file was not correct!";
                             return pointList;
                         }
 
@@ -1853,7 +1858,8 @@ namespace BezierTool
 
             else
             {
-                lblError.Text = "Output error!";
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: Output error!";
             }
 
             string path = Path.Combine(folderPath, "points.txt");
@@ -1888,7 +1894,8 @@ namespace BezierTool
 
             else
             {
-                lblError.Text = "Output error!";
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: Output error!";
             }
 
             string path = Path.Combine(folderPath, "points.txt");
@@ -1910,6 +1917,7 @@ namespace BezierTool
         }
 
 
+        // ???
         private void pnlLastColor_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -1921,6 +1929,7 @@ namespace BezierTool
         }
 
 
+        // ???
         private void btnDefault_Click(object sender, EventArgs e)
         {
             DefaultForm defaultForm = new DefaultForm();
@@ -1929,8 +1938,27 @@ namespace BezierTool
             pbCanva.Invalidate();
         }
 
+
+        //???
         private void cbShowcPoints_CheckedChanged(object sender, EventArgs e)
         {
+            pbCanva.Invalidate();
+        }
+
+
+        //???
+        private void nudZoom_ValueChanged(object sender, EventArgs e)
+        {
+            zoomAmount = Convert.ToDouble(nudZoom.Value / 100);
+            pnlCanva.AutoScroll = true;
+            if (nudZoom.Value == 100)
+            {
+                pnlCanva.AutoScroll = false;
+            }
+            
+            pbCanva.Width = Convert.ToInt32(zoomAmount * pnlCanva.Width);
+            pbCanva.Height = Convert.ToInt32(zoomAmount * pnlCanva.Height);
+            
             pbCanva.Invalidate();
         }
     }
