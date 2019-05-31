@@ -43,6 +43,11 @@ namespace BezierTool
             {
                 InitializeOutput();
             }
+
+            else if (formType == FormMain.FormType.Scale)
+            {
+                InitializeScale();
+            }
         }
 
         private void InitializeAdd()
@@ -182,6 +187,17 @@ namespace BezierTool
             return;
         }
 
+        private void InitializeScale()
+        {
+            this.Text = "Set Scale";
+            labelType = "nr";
+            gbCoordinates.Text = "Set scale point coordinates!";
+            btnAddRow.Visible = false; // can't add or delete input lines when viewing point coordinates
+            btnDeleteRow.Visible = false;
+            AddRow();
+            AddRow();
+        }
+
         private void AddRow()
             //add new row of coordinates to form
         {
@@ -259,6 +275,11 @@ namespace BezierTool
                 Point tmp = new Point(x, y);
 
                 pointList.Add(tmp);
+            }
+
+            if (formType == FormMain.FormType.Scale)
+            {
+                return;
             }
 
             int i = 0;//describes where to save new list of coordinates; need to set value for code to work; chosen arbitrary

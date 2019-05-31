@@ -56,12 +56,11 @@ namespace BezierTool
                     {
                         while ((textLine = file.ReadLine()) != null)
                         {
-                            int index = textLine.IndexOf(' ');
-                            string xCoordinate = textLine.Substring(0, index);
-                            string yCoordinate = textLine.Substring(index + 1);
-
                             try
                             {
+                                int index = textLine.IndexOf(' ');
+                                string xCoordinate = textLine.Substring(0, index);
+                                string yCoordinate = textLine.Substring(index + 1);
                                 point.X = Convert.ToInt32(xCoordinate);
                                 point.Y = Convert.ToInt32(yCoordinate);
                             }
@@ -143,5 +142,6 @@ namespace BezierTool
             curveSize = 1;
             polygonSize = 1;
         }
+
     }
 }

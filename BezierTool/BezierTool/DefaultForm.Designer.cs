@@ -104,34 +104,34 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 240);
+            this.label1.Location = new System.Drawing.Point(12, 275);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(283, 20);
+            this.label1.Size = new System.Drawing.Size(259, 20);
             this.label1.TabIndex = 6;
-            this.label1.Text = "Thickness of Curves:                            px";
+            this.label1.Text = "Thickness of Curves:                      px";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 269);
+            this.label2.Location = new System.Drawing.Point(7, 301);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(332, 20);
+            this.label2.Size = new System.Drawing.Size(264, 20);
             this.label2.TabIndex = 7;
-            this.label2.Text = "Thickness of Polygon Lines:                            px";
+            this.label2.Text = "Thickness of Polygon Lines:           px";
             // 
             // txtCurveSize
             // 
-            this.txtCurveSize.Location = new System.Drawing.Point(168, 237);
+            this.txtCurveSize.Location = new System.Drawing.Point(213, 269);
             this.txtCurveSize.Name = "txtCurveSize";
-            this.txtCurveSize.Size = new System.Drawing.Size(100, 26);
+            this.txtCurveSize.Size = new System.Drawing.Size(34, 26);
             this.txtCurveSize.TabIndex = 8;
             this.txtCurveSize.Text = "1";
             // 
             // txtPolygonSize
             // 
-            this.txtPolygonSize.Location = new System.Drawing.Point(216, 266);
+            this.txtPolygonSize.Location = new System.Drawing.Point(213, 298);
             this.txtPolygonSize.Name = "txtPolygonSize";
-            this.txtPolygonSize.Size = new System.Drawing.Size(100, 26);
+            this.txtPolygonSize.Size = new System.Drawing.Size(34, 26);
             this.txtPolygonSize.TabIndex = 9;
             this.txtPolygonSize.Text = "1";
             // 
