@@ -102,7 +102,7 @@ namespace BezierTool
             }
 
             // dragging a control point with mouse
-            if (cPointsAll != null && modifyPointType == BezierType.cPoints)
+            else if (cPointsAll != null && modifyPointType == BezierType.cPoints)
             {
                 FindLocalPoint(cPointsAll, eZoom);
 
@@ -114,7 +114,7 @@ namespace BezierTool
             }
 
             // dragging a knot point with mouse
-            if (pPointsAll != null && modifyPointType == BezierType.pPoints)
+            else if (pPointsAll != null && modifyPointType == BezierType.pPoints)
             {
                 FindLocalPoint(pPointsAll, eZoom);
 
@@ -126,7 +126,7 @@ namespace BezierTool
             }
 
             // changing parametrization method of a drawn curve
-            if (cPointsAll != null && canChangeParam == true && isChangingParam == false)
+            else if (cPointsAll != null && canChangeParam == true && isChangingParam == false)
             {
                 FindLocalPoint(cPointsAll, eZoom);
 
@@ -138,7 +138,7 @@ namespace BezierTool
             }
 
             // outputting control point coordinates
-            if (cPointsAll != null && outputPointType == BezierType.cPoints)
+            else if (cPointsAll != null && outputPointType == BezierType.cPoints)
             {
                 FindLocalPoint(cPointsAll, eZoom);
 
@@ -170,7 +170,7 @@ namespace BezierTool
             }
 
             // outputting knot point coordinates
-            if (pPointsAll != null && outputPointType == BezierType.pPoints)
+            else if (pPointsAll != null && outputPointType == BezierType.pPoints)
             {
                 FindLocalPoint(pPointsAll, eZoom);
 
@@ -201,7 +201,7 @@ namespace BezierTool
                 pbCanva.Invalidate();
             }
 
-            if (cPointsAll != null && canChangeColor == true)
+            else if (cPointsAll != null && canChangeColor == true)
             {
                 FindLocalPoint(cPointsAll, eZoom);
 
@@ -221,7 +221,7 @@ namespace BezierTool
             }
 
             // deleting a curve
-            if (cPointsAll != null && canDeleteCurve == true)
+            else if (cPointsAll != null && canDeleteCurve == true)
             {
                 FindLocalPoint(cPointsAll, eZoom);
 
@@ -232,7 +232,17 @@ namespace BezierTool
                 }
             }
 
-            if (zoomAmount > 1)
+            else if (isSettingScale == true && scalePoints.Count < 2)
+            {
+                if (scalePoints.Count < 2)
+                {
+
+                    scalePoints.Add(eZoom);
+                }
+                SetScale();
+            }
+
+            else
             {
                 FindLocalPoint(cPointsAll, eZoom);
                 if (localPoint != null)
@@ -251,15 +261,7 @@ namespace BezierTool
 
             }
 
-            if (isSettingScale == true && scalePoints.Count < 2)
-            {
-                if (scalePoints.Count < 2)
-                {
 
-                    scalePoints.Add(eZoom);
-                }
-                SetScale();
-            }
         }
 
 
@@ -693,11 +695,35 @@ namespace BezierTool
             lblError.ForeColor = Color.Black;
             lblError.Text = "Message: Choose two points on screen with mouse! (" + (2 - scalePoints.Count) + " points left)";
 
-            if(scalePoints.Count == 2)
+            if (scalePoints.Count != 2)
             {
-                FormCoordinates fc = new FormCoordinates( FormType.Scale, BezierType.Nothing );
+                return;
+            }
+            
+            if (FormCoordinates.scaleReal == null)
+            {
+                FormCoordinates fc = new FormCoordinates(FormType.Scale, BezierType.Nothing);
                 fc.ShowDialog();
             }
+
+            Point tmp = new Point();
+            tmp.X = FormCoordinates.scaleReal.Item1.X - scalePoints[0].X;
+            tmp.Y = FormCoordinates.scaleReal.Item1.Y - scalePoints[0].Y;
+
+            double propX = (FormCoordinates.scaleReal.Item1.X - FormCoordinates.scaleReal.Item2.X) / Convert.ToDouble(scalePoints[0].X - scalePoints[1].X);
+            double propY = (FormCoordinates.scaleReal.Item1.Y - FormCoordinates.scaleReal.Item2.Y) / Convert.ToDouble(scalePoints[0].Y - scalePoints[1].Y);
+
+            pnlCanva.Width = Convert.ToInt32(Math.Abs(pbCanva.Width * propX));
+            pnlCanva.Height = Convert.ToInt32(Math.Abs(pbCanva.Height * propY));
+
+            pbCanva.Width = Convert.ToInt32(Math.Abs(pbCanva.Width * propX));
+            pbCanva.Height = Convert.ToInt32(Math.Abs(pbCanva.Height * propY));
+
+
+
+            //dpoints?
+
+            return;
         }
 
         // Uploads background image for pbCanva.

@@ -14,6 +14,7 @@ namespace BezierTool
         string labelType = ""; //point type for labels - "C" for control points, "P" for knot points
         int namingCounter = 1; //count of point coordinates, used for naming textboxes and labels
         public static bool curveAdded = false; //to determine if a curve was added successfully
+        public static Tuple<Point, Point> scaleReal = null;
 
         public FormCoordinates( FormMain.FormType thisFormType, FormMain.BezierType thisCurveType)
             //initialization
@@ -279,6 +280,9 @@ namespace BezierTool
 
             if (formType == FormMain.FormType.Scale)
             {
+                scaleReal = new Tuple<Point, Point>(pointList[0], pointList[1]);
+
+                this.Close();
                 return;
             }
 
