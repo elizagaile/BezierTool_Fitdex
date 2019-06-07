@@ -39,6 +39,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txtCurveSize = new System.Windows.Forms.TextBox();
             this.txtPolygonSize = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtPointSize = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btndPointsAdd
@@ -113,11 +115,11 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 301);
+            this.label2.Location = new System.Drawing.Point(12, 301);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(264, 20);
+            this.label2.Size = new System.Drawing.Size(260, 20);
             this.label2.TabIndex = 7;
-            this.label2.Text = "Thickness of Polygon Lines:           px";
+            this.label2.Text = "Thickness of Polygon Lines:          px";
             // 
             // txtCurveSize
             // 
@@ -135,11 +137,30 @@
             this.txtPolygonSize.TabIndex = 9;
             this.txtPolygonSize.Text = "1";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 327);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(258, 20);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Size of Points:                                 px";
+            // 
+            // txtPointSize
+            // 
+            this.txtPointSize.Location = new System.Drawing.Point(213, 327);
+            this.txtPointSize.Name = "txtPointSize";
+            this.txtPointSize.Size = new System.Drawing.Size(34, 26);
+            this.txtPointSize.TabIndex = 12;
+            this.txtPointSize.Text = "2";
+            // 
             // DefaultForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(409, 428);
+            this.Controls.Add(this.txtPointSize);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.txtPolygonSize);
             this.Controls.Add(this.txtCurveSize);
             this.Controls.Add(this.label2);
@@ -170,5 +191,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtCurveSize;
         private System.Windows.Forms.TextBox txtPolygonSize;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtPointSize;
     }
 }

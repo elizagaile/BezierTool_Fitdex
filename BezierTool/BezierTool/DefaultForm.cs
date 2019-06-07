@@ -15,6 +15,10 @@ namespace BezierTool
         public static Color polygonColor = Color.LightGray;
         public static int curveSize = 1;
         public static int polygonSize = 1;
+        public static int pointSize = 2;
+
+        int maxLineSize = 20;
+        int maxPointSize = 5;
 
         public DefaultForm()
         {
@@ -111,15 +115,25 @@ namespace BezierTool
             if (txtCurveSize.Text == "" || txtPolygonSize.Text == "")
             {
                 MessageBox.Show("Must fill all values!");
+                return;
+            }
+
+            if (Convert.ToInt32(txtCurveSize.Text) > maxLineSize  || Convert.ToInt32(txtPolygonSize.Text) > maxLineSize)
+            {
+                MessageBox.Show("Maximum line width is " + maxLineSize + "px!");
+                return;
+
+            }
+
+            if (Convert.ToInt32(txtPointSize.Text) > maxPointSize)
+            {
+                MessageBox.Show("Maximum size of points " + maxPointSize + "px!");
+                return;
             }
 
             curveSize = Convert.ToInt32(txtCurveSize.Text);
             polygonSize = Convert.ToInt32(txtPolygonSize.Text);
-
-            if (curveSize > 20 || polygonSize > 20)
-            {
-                MessageBox.Show("Maximum thickness is 20px!");
-            }
+            pointSize = Convert.ToInt32(txtPointSize.Text);
 
             this.Close();
         }

@@ -61,11 +61,11 @@
             this.rbFileOutput = new System.Windows.Forms.RadioButton();
             this.rbScreenOutput = new System.Windows.Forms.RadioButton();
             this.panel_bottom = new System.Windows.Forms.Panel();
+            this.btnSetScale = new System.Windows.Forms.Button();
             this.btnDefault = new System.Windows.Forms.Button();
             this.nudZoom = new System.Windows.Forms.NumericUpDown();
             this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
-            this.error = new System.Windows.Forms.Label();
             this.btnDeleteCurve = new System.Windows.Forms.Button();
             this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnChangeColor = new System.Windows.Forms.Button();
@@ -73,7 +73,6 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.lblZoom = new System.Windows.Forms.Label();
             this.pnlMessage = new System.Windows.Forms.Panel();
-            this.btnSetScale = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbCanva)).BeginInit();
             this.groupAddInputType.SuspendLayout();
             this.groupAddType.SuspendLayout();
@@ -448,6 +447,16 @@
             this.panel_bottom.Size = new System.Drawing.Size(327, 83);
             this.panel_bottom.TabIndex = 31;
             // 
+            // btnSetScale
+            // 
+            this.btnSetScale.Location = new System.Drawing.Point(0, 3);
+            this.btnSetScale.Name = "btnSetScale";
+            this.btnSetScale.Size = new System.Drawing.Size(159, 37);
+            this.btnSetScale.TabIndex = 41;
+            this.btnSetScale.Text = "Set Scale";
+            this.btnSetScale.UseVisualStyleBackColor = true;
+            this.btnSetScale.Click += new System.EventHandler(this.btnSetScale_Click);
+            // 
             // btnDefault
             // 
             this.btnDefault.Location = new System.Drawing.Point(165, 3);
@@ -501,7 +510,6 @@
             // 
             // panel_tools
             // 
-            this.panel_tools.Controls.Add(this.error);
             this.panel_tools.Controls.Add(this.cbShowcPoints);
             this.panel_tools.Controls.Add(this.btnUploadBackground);
             this.panel_tools.Controls.Add(this.btnDeleteCurve);
@@ -519,15 +527,6 @@
             this.panel_tools.Name = "panel_tools";
             this.panel_tools.Size = new System.Drawing.Size(330, 736);
             this.panel_tools.TabIndex = 32;
-            // 
-            // error
-            // 
-            this.error.AutoSize = true;
-            this.error.Location = new System.Drawing.Point(5, 716);
-            this.error.Name = "error";
-            this.error.Size = new System.Drawing.Size(51, 20);
-            this.error.TabIndex = 41;
-            this.error.Text = "label1";
             // 
             // btnDeleteCurve
             // 
@@ -587,16 +586,6 @@
             this.pnlMessage.Name = "pnlMessage";
             this.pnlMessage.Size = new System.Drawing.Size(1429, 28);
             this.pnlMessage.TabIndex = 40;
-            // 
-            // btnSetScale
-            // 
-            this.btnSetScale.Location = new System.Drawing.Point(0, 3);
-            this.btnSetScale.Name = "btnSetScale";
-            this.btnSetScale.Size = new System.Drawing.Size(159, 37);
-            this.btnSetScale.TabIndex = 41;
-            this.btnSetScale.Text = "Set Scale";
-            this.btnSetScale.UseVisualStyleBackColor = true;
-            this.btnSetScale.Click += new System.EventHandler(this.btnSetScale_Click);
             // 
             // FormMain
             // 
@@ -679,7 +668,6 @@
         private System.Windows.Forms.NumericUpDown nudZoom;
         private System.Windows.Forms.Label lblZoom;
         private System.Windows.Forms.Panel pnlMessage;
-        private System.Windows.Forms.Label error;
         private System.Windows.Forms.Button btnSetScale;
     }
 }
