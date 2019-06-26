@@ -14,7 +14,7 @@ namespace BezierTool
         string labelType = ""; //point type for labels - "C" for control points, "P" for knot points
         int namingCounter = 1; //count of point coordinates, used for naming textboxes and labels
         public static bool curveAdded = false; //to determine if a curve was added successfully
-        public static Tuple<Point, Point> scaleReal = null;
+        public static Tuple<PointF, PointF> scaleReal = null;
 
         public FormCoordinates( FormMain.FormType thisFormType, FormMain.BezierType thisCurveType)
             //initialization
@@ -99,7 +99,7 @@ namespace BezierTool
             btnAddRow.Visible = false; // can't add or delete input lines when modifying a curve
             btnDeleteRow.Visible = false;
 
-            List<Point> pointList = new List<Point>();
+            List<PointF> pointList = new List<PointF>();
             int i = FormMain.localPoint.Item1;
 
             if (FormMain.modifyPointType == FormMain.BezierType.cPoints)
@@ -123,8 +123,8 @@ namespace BezierTool
                 namingCounter = j + 1; //labels start at 1, lists at 0
                 AddRow();
 
-                coordinates[0].Text = "" + pointList[j].X;
-                coordinates[1].Text = "" + pointList[j].Y;
+                coordinates[0].Text = "" + Math.Round(pointList[j].X, 4);
+                coordinates[1].Text = "" + Math.Round(pointList[j].Y, 4);
 
                 return;
             }
@@ -138,23 +138,23 @@ namespace BezierTool
             for (int j = 0; j < pointList.Count; j++)
             // after making input rows, fill each textbox with appropriate coordinate
             {
-                coordinates[2 * j].Text = "" + pointList[j].X;
-                coordinates[2 * j + 1].Text = "" + pointList[j].Y;
+                coordinates[2 * j].Text = "" + Math.Round(pointList[j].X, 4);
+                coordinates[2 * j + 1].Text = "" + Math.Round(pointList[j].Y, 4);
             }
 
             return;
         }
 
 
-        private List<Point> ScaleInputPoints(List<Point> pointList)
+        private List<PointF> ScaleInputPoints(List<PointF> pointList)
         {
-            List<Point> scaleList = new List<Point>();
+            List<PointF> scaleList = new List<PointF>();
 
             for (int i = 0; i < pointList.Count; i++)
             {
-                Point tmp = new Point();
-                tmp.X = Convert.ToInt32(pointList[i].X / FormMain.scalePropX - FormMain.shiftVector.X);
-                tmp.Y = Convert.ToInt32(pointList[i].Y / FormMain.scalePropY - FormMain.shiftVector.Y);
+                PointF tmp = new PointF();
+                tmp.X = pointList[i].X / FormMain.scalePropX - FormMain.shiftVector.X;
+                tmp.Y = pointList[i].Y / FormMain.scalePropY - FormMain.shiftVector.Y;
 
                 scaleList.Add(tmp);
             }
@@ -162,15 +162,15 @@ namespace BezierTool
             return scaleList;
         }
 
-        private List<Point> ScaleOutputPoints(List<Point> pointList)
+        private List<PointF> ScaleOutputPoints(List<PointF> pointList)
         {
-            List<Point> scaleList = new List<Point>();
+            List<PointF> scaleList = new List<PointF>();
 
             for (int i = 0; i< pointList.Count; i++)
             {
-                Point tmp = new Point();
-                tmp.X = Convert.ToInt32((pointList[i].X + FormMain.shiftVector.X) * FormMain.scalePropX);
-                tmp.Y = Convert.ToInt32((pointList[i].Y + FormMain.shiftVector.Y) * FormMain.scalePropY);
+                PointF tmp = new PointF();
+                tmp.X = (pointList[i].X + FormMain.shiftVector.X) * FormMain.scalePropX;
+                tmp.Y = (pointList[i].Y + FormMain.shiftVector.Y) * FormMain.scalePropY;
 
                 scaleList.Add(tmp);
             }
@@ -188,7 +188,7 @@ namespace BezierTool
             btnResetInput.Visible = false; // can't reset point coordinates when viewing
             btnSubmitInput.Visible = false; // can't submit point coordinates when viewing
 
-            List<Point> pointList = new List<Point>();
+            List<PointF> pointList = new List<PointF>();
             int i = FormMain.localPoint.Item1;
 
             if (FormMain.outputPointType == FormMain.BezierType.cPoints)
@@ -214,8 +214,8 @@ namespace BezierTool
             for (int j = 0; j < pointList.Count; j++)
             // after making input rows, fill each textbox with appropriate coordinate
             {
-                coordinates[2 * j].Text = "" + pointList[j].X;
-                coordinates[2 * j + 1].Text = "" + pointList[j].Y;
+                coordinates[2 * j].Text = "" + Math.Round(pointList[j].X, 4);
+                coordinates[2 * j + 1].Text = "" + Math.Round(pointList[j].Y, 4);
             }
 
             return;
@@ -298,15 +298,15 @@ namespace BezierTool
                 }
             }
 
-            List<Point> pointList = new List<Point>();
-            int x, y;
+            List<PointF> pointList = new List<PointF>();
+            float x, y;
 
             for (int j = 0; j < coordinates.Count; j += 2)
             //put all values from textboxes to list of control points
             {
-                x = Convert.ToInt32(coordinates[j].Text);
+                x = float.Parse(coordinates[j].Text);
                 y = Convert.ToInt32(coordinates[j + 1].Text);
-                Point tmp = new Point(x, y);
+                PointF tmp = new PointF(x, y);
 
                 pointList.Add(tmp);
             }
@@ -320,7 +320,7 @@ namespace BezierTool
                     return;
                 }
 
-                scaleReal = new Tuple<Point, Point>(pointList[0], pointList[1]);
+                scaleReal = new Tuple<PointF, PointF>(pointList[0], pointList[1]);
 
                 this.Close();
                 return;

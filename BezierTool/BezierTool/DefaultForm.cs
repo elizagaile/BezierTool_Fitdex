@@ -8,7 +8,7 @@ namespace BezierTool
 {
     public partial class DefaultForm : Form
     {
-        public static List<Point> dPoints = new List<Point>();
+        public static List<PointF> dPoints = new List<PointF>();
         public static Color dPointsColor = Color.Green;
         public static Color cPointsColor = Color.Red;
         public static Color pPointsColor = Color.Black;
@@ -29,7 +29,7 @@ namespace BezierTool
 
         private void btndPointsAdd_Click(object sender, EventArgs e)
         {
-                Point point = new Point();
+                PointF point = new PointF();
 
                 string path = "";
                 string textLine = "";
@@ -148,7 +148,7 @@ namespace BezierTool
 
         public static void ResetAll()
         {
-            dPoints = new List<Point>();
+            dPoints = new List<PointF>();
             dPointsColor = Color.Blue;
             cPointsColor = Color.Red;
             pPointsColor = Color.Black;

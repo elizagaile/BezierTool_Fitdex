@@ -40,7 +40,6 @@
             this.btnResetInput = new System.Windows.Forms.Button();
             this.btnAddRow = new System.Windows.Forms.Button();
             this.gbCoordinates.SuspendLayout();
-            this.flpCoordinates.SuspendLayout();
             this.tlpCoordinates.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,7 +47,7 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(80, 0);
+            this.label6.Location = new System.Drawing.Point(89, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(20, 20);
             this.label6.TabIndex = 5;
@@ -58,7 +57,7 @@
             // 
             this.label7.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(160, 0);
+            this.label7.Location = new System.Drawing.Point(186, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(20, 20);
             this.label7.TabIndex = 6;
@@ -66,6 +65,7 @@
             // 
             // gbCoordinates
             // 
+            this.gbCoordinates.Controls.Add(this.tlpCoordinates);
             this.gbCoordinates.Controls.Add(this.btnDeleteRow);
             this.gbCoordinates.Controls.Add(this.flpCoordinates);
             this.gbCoordinates.Controls.Add(this.btnSubmitInput);
@@ -90,7 +90,6 @@
             // 
             // flpCoordinates
             // 
-            this.flpCoordinates.Controls.Add(this.tlpCoordinates);
             this.flpCoordinates.Location = new System.Drawing.Point(40, 25);
             this.flpCoordinates.Name = "flpCoordinates";
             this.flpCoordinates.Size = new System.Drawing.Size(257, 432);
@@ -100,14 +99,14 @@
             // 
             this.tlpCoordinates.ColumnCount = 4;
             this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 99F));
+            this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 94F));
+            this.tlpCoordinates.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 8F));
             this.tlpCoordinates.Controls.Add(this.label7, 2, 0);
             this.tlpCoordinates.Controls.Add(this.label6, 1, 0);
             this.tlpCoordinates.Controls.Add(this.label1, 0, 0);
             this.tlpCoordinates.Controls.Add(this.label2, 3, 0);
-            this.tlpCoordinates.Location = new System.Drawing.Point(3, 3);
+            this.tlpCoordinates.Location = new System.Drawing.Point(15, 25);
             this.tlpCoordinates.Name = "tlpCoordinates";
             this.tlpCoordinates.RowCount = 5;
             this.tlpCoordinates.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -115,7 +114,7 @@
             this.tlpCoordinates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpCoordinates.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpCoordinates.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tlpCoordinates.Size = new System.Drawing.Size(231, 423);
+            this.tlpCoordinates.Size = new System.Drawing.Size(282, 423);
             this.tlpCoordinates.TabIndex = 8;
             // 
             // label1
@@ -129,7 +128,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(213, 0);
+            this.label2.Location = new System.Drawing.Point(246, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(0, 20);
             this.label2.TabIndex = 8;
@@ -174,7 +173,6 @@
             this.Controls.Add(this.gbCoordinates);
             this.Name = "FormCoordinates";
             this.gbCoordinates.ResumeLayout(false);
-            this.flpCoordinates.ResumeLayout(false);
             this.tlpCoordinates.ResumeLayout(false);
             this.tlpCoordinates.PerformLayout();
             this.ResumeLayout(false);

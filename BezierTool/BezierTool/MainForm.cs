@@ -22,8 +22,8 @@ namespace BezierTool
         public enum BezierType { cPoints, pPoints, LeastSquares, Composite, Nothing }; 
         public static List<BezierType> allCurves = new List<BezierType>();
 
-        public static List<List<Point>> cPointsAll = new List<List<Point>>();
-        public static List<List<Point>> pPointsAll = new List<List<Point>>();
+        public static List<List<PointF>> cPointsAll = new List<List<PointF>>();
+        public static List<List<PointF>> pPointsAll = new List<List<PointF>>();
 
         // all possible parametrization types of interpolated curves:
         enum ParamType { Uniform, Chord, Centripetal, Nothing };
@@ -43,11 +43,11 @@ namespace BezierTool
         
         public static Tuple<int, int> localPoint = null; //position of a selected point in the representitive lists
 
-        private List<Point> cPoints = null; // list of control points of a curve
-        private List<Point> pPoints = null; // list of knot points of a curve
+        private List<PointF> cPoints = null; // list of control points of a curve
+        private List<PointF> pPoints = null; // list of knot points of a curve
 
-        private Point cPointNew; // location of a new control point for <4 cPoints> curve 
-        private Point preCanvaMove;
+        private PointF cPointNew; // location of a new control point for <4 cPoints> curve 
+        private PointF preCanvaMove;
 
         public const int maxPointCount = 500; // maximum count of points for <Least Squares> and <Composite> curves; chosen arbitrary
 
@@ -59,20 +59,20 @@ namespace BezierTool
         bool canMoveCanva = false;
 
         bool isSettingScale = false;
-        List<Point> scalePoints = new List<Point>();
-        public static double scalePropX = 1;
-        public static double scalePropY = 1;
-        public static Point shiftVector = new Point(0,0);
+        List<PointF> scalePoints = new List<PointF>();
+        public static float scalePropX = 1;
+        public static float scalePropY = 1;
+        public static PointF shiftVector = new PointF(0,0);
 
         List<Color> curveColor = new List<Color>();
         Color lastColor = Color.Black;
 
         String imageLocation = ""; //path of background image
 
-        double zoomAmount = 1;
-        List<List<Point>> cPointsZoom = new List<List<Point>>();
-        List<List<Point>> pPointsZoom = new List<List<Point>>();
-        List<Point> dPointsZoom = new List<Point>();
+        float zoomAmount = 1;
+        List<List<PointF>> cPointsZoom = new List<List<PointF>>();
+        List<List<PointF>> pPointsZoom = new List<List<PointF>>();
+        List<PointF> dPointsZoom = new List<PointF>();
 
         public FormMain()
         {
@@ -87,9 +87,9 @@ namespace BezierTool
         // for dragging points with mouse or for selecting a curve to output its point coordinates
         private void pbCanva_MouseDown(object sender, MouseEventArgs e)
         {
-            Point eZoom = new Point();
-            eZoom.X = Convert.ToInt32(e.X / zoomAmount);
-            eZoom.Y = Convert.ToInt32(e.Y / zoomAmount);
+            PointF eZoom = new PointF();
+            eZoom.X = e.X / zoomAmount;
+            eZoom.Y = e.Y / zoomAmount;
 
             // addding a new control point with mouse for <4 cPoints> curve
             if (addType == BezierType.cPoints && rbMouseInput.Checked == true)
@@ -250,9 +250,7 @@ namespace BezierTool
         // for for modifying points of a curve by mouse.
         private void pbCanva_MouseMove(object sender, MouseEventArgs e)
         {
-            Point eZoom = new Point();
-            eZoom.X = Convert.ToInt32(e.X / zoomAmount);
-            eZoom.Y = Convert.ToInt32(e.Y / zoomAmount);
+            PointF eZoom = new PointF(e.X / zoomAmount, e.Y / zoomAmount);
 
             // get the new control point coordines for <4 cPoints> curve
             if (addType == BezierType.cPoints)
@@ -341,8 +339,8 @@ namespace BezierTool
             else if (canMoveCanva == true)
             {
                 Point tmp = new Point();
-                tmp.X = Math.Min(pbCanva.Location.X + e.X - preCanvaMove.X, 2);
-                tmp.Y = Math.Min(pbCanva.Location.Y + e.Y - preCanvaMove.Y, 2);
+                tmp.X = Convert.ToInt32(Math.Min(pbCanva.Location.X + e.X - preCanvaMove.X, 2));
+                tmp.Y = Convert.ToInt32(Math.Min(pbCanva.Location.Y + e.Y - preCanvaMove.Y, 2));
 
                 pbCanva.Location = tmp;
             }
@@ -394,17 +392,17 @@ namespace BezierTool
         //???
         private void MakeZoomLists()
         {
-            Point tmp = new Point();
-            dPointsZoom = new List<Point>();
-            cPointsZoom = new List<List<Point>>();
-            pPointsZoom = new List<List<Point>>();
+            PointF tmp = new PointF();
+            dPointsZoom = new List<PointF>();
+            cPointsZoom = new List<List<PointF>>();
+            pPointsZoom = new List<List<PointF>>();
 
             if (DefaultForm.dPoints != null)
             {
                 for (int i = 0; i < DefaultForm.dPoints.Count; i++)
                 {
-                    tmp.X = Convert.ToInt32(DefaultForm.dPoints[i].X * zoomAmount);
-                    tmp.Y = Convert.ToInt32(DefaultForm.dPoints[i].Y * zoomAmount);
+                    tmp.X = DefaultForm.dPoints[i].X * zoomAmount;
+                    tmp.Y = DefaultForm.dPoints[i].Y * zoomAmount;
                     dPointsZoom.Add(tmp);
                 }
             }
@@ -413,14 +411,14 @@ namespace BezierTool
             {
                 for (int i = 0; i < cPointsAll.Count; i++)
                 {
-                    List<Point> cList = new List<Point>();
+                    List<PointF> cList = new List<PointF>();
                     cPointsZoom.Add(cList);
                     if (cPointsAll[i] != null)
                     {
                         for (int j = 0; j < cPointsAll[i].Count; j++)
                         {
-                            tmp.X = Convert.ToInt32(cPointsAll[i][j].X * zoomAmount);
-                            tmp.Y = Convert.ToInt32(cPointsAll[i][j].Y * zoomAmount);
+                            tmp.X = cPointsAll[i][j].X * zoomAmount;
+                            tmp.Y = cPointsAll[i][j].Y * zoomAmount;
                             cPointsZoom[i].Add(tmp);
                         }
                     }
@@ -432,14 +430,14 @@ namespace BezierTool
             {
                 for (int i = 0; i < pPointsAll.Count; i++)
                 {
-                    List<Point> pList = new List<Point>();
+                    List<PointF> pList = new List<PointF>();
                     pPointsZoom.Add(pList);
                     if (pPointsAll[i] != null)
                     {
                         for (int j = 0; j < pPointsAll[i].Count; j++)
                         {
-                            tmp.X = Convert.ToInt32(pPointsAll[i][j].X * zoomAmount);
-                            tmp.Y = Convert.ToInt32(pPointsAll[i][j].Y * zoomAmount);
+                            tmp.X = pPointsAll[i][j].X * zoomAmount;
+                            tmp.Y = pPointsAll[i][j].Y * zoomAmount;
                             pPointsZoom[i].Add(tmp);
                         }
                     }
@@ -483,7 +481,7 @@ namespace BezierTool
 
             if (DefaultForm.dPoints != null)
             {
-                foreach (Point dPoint in dPointsZoom)
+                foreach (PointF dPoint in dPointsZoom)
                 {
                     e.Graphics.FillEllipse(dPointBrush, dPoint.X - pointRadius, dPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                 }
@@ -501,9 +499,9 @@ namespace BezierTool
                 // <4 cPoints> curves can't have more than 4 control points
                 if (cPoints.Count < 4 && addType == BezierType.cPoints && rbMouseInput.Checked == true)
                 {
-                    Point tmp = new Point();
-                    tmp.X = Convert.ToInt32( cPoints[cPoints.Count - 1].X * zoomAmount);
-                    tmp.Y = Convert.ToInt32(cPoints[cPoints.Count - 1].Y * zoomAmount);
+                    PointF tmp = new PointF();
+                    tmp.X = cPoints[cPoints.Count - 1].X * zoomAmount;
+                    tmp.Y = cPoints[cPoints.Count - 1].Y * zoomAmount;
                     e.Graphics.DrawLine(dashedPen, tmp, cPointNew);
                 }
             }
@@ -517,7 +515,7 @@ namespace BezierTool
                     // draw a black point for every point
                     if (cbShowcPoints.Checked == true)
                     {
-                        foreach (Point pPoint in pPointsZoom[i])
+                        foreach (PointF pPoint in pPointsZoom[i])
                         {
                             e.Graphics.FillEllipse(pPointBrush, pPoint.X - pointRadius, pPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                         }
@@ -540,14 +538,14 @@ namespace BezierTool
                     {
                         if (isCompositeDone == true && pPointsAll[i].Count == 2)
                         {
-                            cPointsAll[i] = new List<Point>();
+                            cPointsAll[i] = new List<PointF>();
                             AddOnlycPointsComposite(i);
                         }
 
                         // if <Composite> curve has more than 3 knot points, calculate control points
                         else if (pPointsAll[i].Count >= 3)
                         {
-                            cPointsAll[i] = new List<Point>();
+                            cPointsAll[i] = new List<PointF>();
                             AddcPointsComposite(i);
                         }
                     }
@@ -567,7 +565,7 @@ namespace BezierTool
                     // for <4 cPoints> and <Least Squares> curves draw all control points
                     if ((allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares) && cbShowcPoints.Checked == true)
                     {
-                        foreach (Point cPoint in cPointsZoom[i])
+                        foreach (PointF cPoint in cPointsZoom[i])
                         {
                             e.Graphics.DrawEllipse(cPointBrush, cPoint.X - pointRadius, cPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                         }
@@ -702,23 +700,23 @@ namespace BezierTool
                 return;
             }
 
-            Point scaleVector = new Point
+            PointF scaleVector = new PointF
             (
                 FormCoordinates.scaleReal.Item2.X - FormCoordinates.scaleReal.Item1.X,
                 FormCoordinates.scaleReal.Item2.Y - FormCoordinates.scaleReal.Item1.Y
             );
 
-            Point screenVector = new Point
+            PointF screenVector = new PointF
             (
                 scalePoints[1].X - scalePoints[0].X,
                 scalePoints[1].Y - scalePoints[0].Y
             );
 
-            scalePropX = Convert.ToDouble(scaleVector.X) / screenVector.X;
-            scalePropY = Convert.ToDouble(scaleVector.Y) / screenVector.Y;
+            scalePropX = scaleVector.X / screenVector.X;
+            scalePropY = scaleVector.Y / screenVector.Y;
 
-            shiftVector.X = Convert.ToInt32(FormCoordinates.scaleReal.Item1.X / scalePropX - scalePoints[0].X);
-            shiftVector.Y = Convert.ToInt32(FormCoordinates.scaleReal.Item1.Y / scalePropY - scalePoints[0].Y);
+            shiftVector.X = FormCoordinates.scaleReal.Item1.X / scalePropX - scalePoints[0].X;
+            shiftVector.Y = FormCoordinates.scaleReal.Item1.Y / scalePropY - scalePoints[0].Y;
             
             lblError.Text = "" + scalePropX + " " + scalePropY + " " + shiftVector;
 
@@ -726,9 +724,9 @@ namespace BezierTool
             {
                 for (int i = 0; i < DefaultForm.dPoints.Count; i++)
                 {
-                    Point tmp = new Point();
-                    tmp.X = Convert.ToInt32(DefaultForm.dPoints[i].X / scalePropX - shiftVector.X);
-                    tmp.Y = Convert.ToInt32(DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y);
+                    PointF tmp = new PointF();
+                    tmp.X = DefaultForm.dPoints[i].X / scalePropX - shiftVector.X;
+                    tmp.Y = DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y;
 
                     DefaultForm.dPoints[i] = tmp;
                 }
@@ -1106,12 +1104,12 @@ namespace BezierTool
             parametrization = new List<ParamType>();
             curveColor = new List<Color>();
 
-            cPointsAll = new List<List<Point>>();
-            pPointsAll = new List<List<Point>>();
+            cPointsAll = new List<List<PointF>>();
+            pPointsAll = new List<List<PointF>>();
 
             scalePropX = 1;
             scalePropY = 1;
-            shiftVector = new Point(0, 0);
+            shiftVector = new PointF(0, 0);
             FormCoordinates.scaleReal = null;
 
             cPoints = null;
@@ -1202,13 +1200,13 @@ namespace BezierTool
 
 
         // Add new control point by mouse to the last curve.
-        private void AddcPoint(Point mouseLocation)
+        private void AddcPoint(PointF mouseLocation)
         {
             // adding the first control point of curve
             if (cPoints == null)
             {
                 NewCurve(addType);
-                cPoints = new List<Point> { mouseLocation };
+                cPoints = new List<PointF> { mouseLocation };
                 cPointsAll[cPointsAll.Count - 1] = cPoints;
             }
 
@@ -1223,13 +1221,13 @@ namespace BezierTool
 
 
         // Add new knot point by mouse to the last curve.
-        private void AddpPoint(Point mouseLocation)
+        private void AddpPoint(PointF mouseLocation)
         {
             // adding the first control point of curve
             if (pPoints == null)
             {
                 NewCurve(addType);
-                pPoints = new List<Point> { mouseLocation };
+                pPoints = new List<PointF> { mouseLocation };
                 pPointsAll[pPointsAll.Count - 1] = pPoints;
                 
                 return;
@@ -1273,7 +1271,7 @@ namespace BezierTool
             cPointsAll[i].Add(pPointsAll[i][0]);
 
             // add first handle:
-            Point firstHandle = new Point();
+            PointF firstHandle = new PointF();
             firstHandle = GetFirstHandle(pPointsAll[i][0], pPointsAll[i][1], pPointsAll[i][2]);
             cPointsAll[i].Add(GetVeryFirstHandle(pPointsAll[i][0], firstHandle, pPointsAll[i][1]));
 
@@ -1292,9 +1290,7 @@ namespace BezierTool
             // minus two (each end point doesn't have one handle) more control points than knot points
             if ((i != allCurves.Count - 1 && cPointsAll[i].Count < pCount * 3 - 2) || (i == allCurves.Count - 1 && isCompositeDone == true))
             {
-
-
-                Point veryLastHandle;
+                PointF veryLastHandle;
                 veryLastHandle = GetVeryLastHandle(pPointsAll[i][pCount - 2], cPointsAll[i][cPointsAll[i].Count - 1], pPointsAll[i][pCount - 1]);
                 cPointsAll[i].Add(veryLastHandle);
                 cPointsAll[i].Add(pPointsAll[i][pPointsAll[i].Count - 1]);
@@ -1307,30 +1303,30 @@ namespace BezierTool
         // Finish a <Composite> curve, that has only two control points, but is indicated as finished.
         private void AddOnlycPointsComposite(int i)
         {
-            Point firstcPoint = new Point();
-            Point firstHandle = new Point();
-            Point secondHandle = new Point();
-            Point lastcPoint = new Point();
+            PointF firstcPoint = new PointF();
+            PointF firstHandle = new PointF();
+            PointF secondHandle = new PointF();
+            PointF lastcPoint = new PointF();
 
             // first and last control points are knot points of the curve:
             firstcPoint = pPointsAll[i][0];
             lastcPoint = pPointsAll[i][1];
 
-            double sin60 = Math.Sin(Math.PI / 3);
-            double cos60 = Math.Cos(Math.PI / 3);
+            float sin60 = (float)Math.Sin(Math.PI / 3);
+            float cos60 = (float)Math.Cos(Math.PI / 3);
 
             // each control point will be the midpoint of firstcPoint-lastcPoint curve segment, rotated by 60 degrees
             // first we find oordinates of the midpoint:
-            double xMidpoint = 0.5 * (lastcPoint.X - firstcPoint.X);
-            double yMidpoint = 0.5 * (lastcPoint.Y - firstcPoint.Y);
+            float xMidpoint = (float)0.5 * (lastcPoint.X - firstcPoint.X);
+            float yMidpoint = (float)0.5 * (lastcPoint.Y - firstcPoint.Y);
 
             // then we rotate the midpoint by 60 degrees:
-            firstHandle.X = Convert.ToInt32(cos60 * xMidpoint - sin60 * yMidpoint + firstcPoint.X);
-            firstHandle.Y = Convert.ToInt32(sin60 * xMidpoint + cos60 * yMidpoint + firstcPoint.Y);
+            firstHandle.X = cos60 * xMidpoint - sin60 * yMidpoint + firstcPoint.X;
+            firstHandle.Y = sin60 * xMidpoint + cos60 * yMidpoint + firstcPoint.Y;
 
             // for control points of the curve to be on different sides, change the signs for second handle:
-            secondHandle.X = Convert.ToInt32(cos60 * -xMidpoint - sin60 * -yMidpoint + lastcPoint.X);
-            secondHandle.Y = Convert.ToInt32(sin60 * -xMidpoint + cos60 * -yMidpoint + lastcPoint.Y);
+            secondHandle.X = cos60 * -xMidpoint - sin60 * -yMidpoint + lastcPoint.X;
+            secondHandle.Y = sin60 * -xMidpoint + cos60 * -yMidpoint + lastcPoint.Y;
 
             cPointsAll[i].Add(firstcPoint);
             cPointsAll[i].Add(firstHandle);
@@ -1344,15 +1340,15 @@ namespace BezierTool
 
 
         // Add the very first control point that's not a knot point for <Composite> curve with at least three knot points.
-        private Point GetVeryFirstHandle(Point firstpPoint, Point nextHandle, Point secondpPoint)
+        private PointF GetVeryFirstHandle(PointF firstpPoint, PointF nextHandle, PointF secondpPoint)
         {
-            Point veryFirstHandle = new Point();
+            PointF veryFirstHandle = new PointF();
 
             // coordinates of the very first handle is calculated from first, third and fourth control points of the  <Composite> curve
 
             // We can look at these calculations as vector operations. 
             // First, we calculate dot product of vectors secondpPoint-nextHandle and secondpPoint-firstpPOint:
-            double dotProduct = (nextHandle.X - secondpPoint.X) * (firstpPoint.X - secondpPoint.X) +
+            float dotProduct = (nextHandle.X - secondpPoint.X) * (firstpPoint.X - secondpPoint.X) +
                                 (nextHandle.Y - secondpPoint.Y) * (firstpPoint.Y - secondpPoint.Y);
 
             //We need to find how long the vector v1 from veryFirstHandle to nextHandle needs to be, so that the middle control points are symmetrical.
@@ -1363,11 +1359,11 @@ namespace BezierTool
             //we get: proportion = 1 - 2 * dot / |v2|^2
 
             //That means, the length of the vector we will add equals 
-            double prop = 1 - 2 * dotProduct / (Math.Pow(GetLength(firstpPoint, secondpPoint), 2));
+            float prop = 1 - 2 * dotProduct / (float)Math.Pow(GetLength(firstpPoint, secondpPoint), 2);
 
             //Lastly, to point nextHandle we add vector parallel to vector firstpPoint-secondpPoint scaled by the proportion:
-            veryFirstHandle.X = Convert.ToInt32(nextHandle.X + prop * (firstpPoint.X - secondpPoint.X));
-            veryFirstHandle.Y = Convert.ToInt32(nextHandle.Y + prop * (firstpPoint.Y - secondpPoint.Y));
+            veryFirstHandle.X = nextHandle.X + prop * (firstpPoint.X - secondpPoint.X);
+            veryFirstHandle.Y = nextHandle.Y + prop * (firstpPoint.Y - secondpPoint.Y);
 
             // We have achieved a "symmetrical" point to nextHandle; both of these points are on the same side of the bezier curve.
 
@@ -1376,63 +1372,63 @@ namespace BezierTool
 
 
         // Calculate coordinates of first handle for <Composite> curves in a way to ensure C2 continuity.
-        private Point GetFirstHandle(Point prevpPoint, Point thispPoint, Point nextpPoint)
+        private PointF GetFirstHandle(PointF prevpPoint, PointF thispPoint, PointF nextpPoint)
         {
-            Point firstHandle = new Point();
-            double lengthPrevThis = GetLength(prevpPoint, thispPoint);
-            double lengthThisNext = GetLength(thispPoint, nextpPoint);
+            PointF firstHandle = new PointF();
+            float lengthPrevThis = GetLength(prevpPoint, thispPoint);
+            float lengthThisNext = GetLength(thispPoint, nextpPoint);
 
             // Distance from first to second handle is half the distance from prevpPoint (a) to nextpPoint (b).
             // The proportions of the length of each handle are the same as proportion ab/bc, where b thispPoint.
             // Methods of calculations for distances and angles of handles can be different and there isn't one best method. 
             // I have discovered that this method works nice most of the time and isn't computationally expensive.
 
-            double proportion = 0.5 * lengthPrevThis / (lengthPrevThis + lengthThisNext);
+            float proportion = (float)0.5 * lengthPrevThis / (lengthPrevThis + lengthThisNext);
 
-            firstHandle.X = thispPoint.X + Convert.ToInt32(proportion * (prevpPoint.X - nextpPoint.X));
-            firstHandle.Y = thispPoint.Y + Convert.ToInt32(proportion * (prevpPoint.Y - nextpPoint.Y));
+            firstHandle.X = thispPoint.X + proportion * (prevpPoint.X - nextpPoint.X);
+            firstHandle.Y = thispPoint.Y + proportion * (prevpPoint.Y - nextpPoint.Y);
 
             return firstHandle;
         }
 
 
         // Calculate coordinates of second handle for <Composite> curves in a way to ensure C2 continuity.
-        private Point GetSecondHandle(Point prevpPoint, Point thispPoint, Point nextpPoint)
+        private PointF GetSecondHandle(PointF prevpPoint, PointF thispPoint, PointF nextpPoint)
         {
-            Point secondHandle = new Point();
-            double lengthPrevThis = GetLength(prevpPoint, thispPoint);
-            double lengthThisNext = GetLength(thispPoint, nextpPoint);
+            PointF secondHandle = new PointF();
+            float lengthPrevThis = GetLength(prevpPoint, thispPoint);
+            float lengthThisNext = GetLength(thispPoint, nextpPoint);
 
             //Calculations are very similar to those in the function GetFirstHandle.
 
-            double proportion = 0.5 * lengthThisNext / (lengthPrevThis + lengthThisNext);
+            float proportion = (float)0.5 * lengthThisNext / (lengthPrevThis + lengthThisNext);
 
-            secondHandle.X = thispPoint.X + Convert.ToInt32(proportion * (nextpPoint.X - prevpPoint.X));
-            secondHandle.Y = thispPoint.Y + Convert.ToInt32(proportion * (nextpPoint.Y - prevpPoint.Y));
+            secondHandle.X = thispPoint.X + proportion * (nextpPoint.X - prevpPoint.X);
+            secondHandle.Y = thispPoint.Y + proportion * (nextpPoint.Y - prevpPoint.Y);
 
             return secondHandle;
         }
 
 
         // Add two last control points of a <Composite> curve that is indicated as finished and has at least three knot points
-        private Point GetVeryLastHandle(Point prevpPoint, Point prevHandle, Point lastpPoint)
+        private PointF GetVeryLastHandle(PointF prevpPoint, PointF prevHandle, PointF lastpPoint)
         {
-            Point veryLastHandle = new Point();
+            PointF veryLastHandle = new PointF();
 
             // Coordinates of the very last handle is calculated from first, second and fourth control points of the <Composite> curve's last segment
 
             // We can look at these calculations as vector operations. 
             // First we calculate dot product of vectors lastpPoint-prevHandle and lastpPoint-prevHandle:
-            double dotProduct = (prevHandle.X - lastpPoint.X) * (prevpPoint.X - lastpPoint.X) + 
+            float dotProduct = (prevHandle.X - lastpPoint.X) * (prevpPoint.X - lastpPoint.X) + 
                                 (prevHandle.Y - lastpPoint.Y) * (prevpPoint.Y - lastpPoint.Y);
 
             // Calculations are very similar to those in the function GetVeryFirstHandle.
             // To find how long the vector from prevHandle to veryLastHandle needs to be, we find the proportion:
-            double proportion = 1 - 2 * dotProduct / (Math.Pow(GetLength(prevpPoint, lastpPoint), 2));
+            float proportion = 1 - 2 * dotProduct / (float)Math.Pow(GetLength(prevpPoint, lastpPoint), 2);
 
             // Lastly, to point prevHandle we add vector parallel to vector prevpPoint-lastpPoint scaled by the  proportion:
-            veryLastHandle.X = Convert.ToInt32(proportion * (prevpPoint.X - lastpPoint.X) + prevHandle.X);
-            veryLastHandle.Y = Convert.ToInt32(proportion * (prevpPoint.Y - lastpPoint.Y) + prevHandle.Y);
+            veryLastHandle.X = proportion * (prevpPoint.X - lastpPoint.X) + prevHandle.X;
+            veryLastHandle.Y = proportion * (prevpPoint.Y - lastpPoint.Y) + prevHandle.Y;
 
             // We have achieved a "symmetrical" point to prevHandle; both of these points are on the same side of the bezier curve.
 
@@ -1530,7 +1526,7 @@ namespace BezierTool
 
         // To ensure C2 continuity, when dragging a control point of a <Composite> curve with the left mouse button, 
         // the opposite handle needs to move as well.
-        private void ModifyHandleComposite(Point modifyHandle, Point middlepPoint, Point oppositeHandle, int opposite)
+        private void ModifyHandleComposite(PointF modifyHandle, PointF middlepPoint, PointF oppositeHandle, int opposite)
         {
 
             // It doesn't make mathematical sense and makes an error for two control points in <Composite> curve segment to have the same location.
@@ -1545,10 +1541,10 @@ namespace BezierTool
             //To do that, we take unit vector from moving-middle (devide moving-middle with its length) and multiply that by 
             //middle-change length. Finally, we add that to middle point.
 
-            double proportion = GetLength(middlepPoint, oppositeHandle) / GetLength(modifyHandle, middlepPoint);
+            float proportion = GetLength(middlepPoint, oppositeHandle) / GetLength(modifyHandle, middlepPoint);
 
-            oppositeHandle.X = Convert.ToInt32(middlepPoint.X + proportion * (middlepPoint.X - modifyHandle.X));
-            oppositeHandle.Y = Convert.ToInt32(middlepPoint.Y + proportion * (middlepPoint.Y - modifyHandle.Y));
+            oppositeHandle.X = middlepPoint.X + proportion * (middlepPoint.X - modifyHandle.X);
+            oppositeHandle.Y = middlepPoint.Y + proportion * (middlepPoint.Y - modifyHandle.Y);
 
             cPointsAll[localPoint.Item1][opposite] = oppositeHandle;
 
@@ -1558,7 +1554,7 @@ namespace BezierTool
 
         // To ensure C2 continuity and make sure no other points move when dragging a control point of a <Composite> curve with the right mouse button, 
         //the control point can only be moved in a straight line away from the middle point. 
-        private void ModifyHandleCompositeStraight(Point modifyHandle, Point middlepPoint, Point oppositeHandle)
+        private void ModifyHandleCompositeStraight(PointF modifyHandle, PointF middlepPoint, PointF oppositeHandle)
         {
             const int maxDistanceToMouse = 100; // maximum distance between mouse location and control point being dragged; chosen arbitrary
 
@@ -1570,16 +1566,16 @@ namespace BezierTool
                 return;
             }
 
-            Point result = new Point();
+            PointF result = new PointF();
 
             // To move the control point in straight line, we take unit vector from the middlepPoint to 
             // the place control point was before moving (modifyHandle). It's known that modifyHandle was on the needed curve. 
             // Than we scale this unit vector by the distance mouse is from the middlepPoint and at last add this vector to the middlepPoint.
 
-            double prop = GetLength(middlepPoint, modifyHandle) / GetLength(oppositeHandle, middlepPoint);
+            float prop = GetLength(middlepPoint, modifyHandle) / GetLength(oppositeHandle, middlepPoint);
 
-            result.X = Convert.ToInt32(middlepPoint.X + prop * (middlepPoint.X - oppositeHandle.X));
-            result.Y = Convert.ToInt32(middlepPoint.Y + prop * (middlepPoint.Y - oppositeHandle.Y));
+            result.X = middlepPoint.X + prop * (middlepPoint.X - oppositeHandle.X);
+            result.Y = middlepPoint.Y + prop * (middlepPoint.Y - oppositeHandle.Y);
 
             cPointsAll[i][j] = result;
 
@@ -1588,12 +1584,12 @@ namespace BezierTool
 
 
         // Modify coordinates of a chosen knot point of <Composite> curve.
-        public static void ModifypPointComposite(Point mouseLocation)
+        public static void ModifypPointComposite(PointF mouseLocation)
         {
             int i = localPoint.Item1;
             int j = localPoint.Item2;
 
-            Point pointOld = new Point();
+            PointF pointOld = new PointF();
             pointOld = pPointsAll[i][j];
 
             // every knot point of <Composite> curve is also a control point; change both these point coordinates:
@@ -1604,7 +1600,7 @@ namespace BezierTool
             // We want for the adjacent handles of the knot point to stay in the same position relative to the knot point. 
             // To do that, we take vectors from knot point to control points and add those vectors to the new knot point coordinates.
 
-            Point newcPoint = new Point();
+            PointF newcPoint = new PointF();
 
             // first knot point doesn't have the first handle
             if (j != 0)
@@ -1664,7 +1660,7 @@ namespace BezierTool
 
 
         // Find if there is a control or knot point near mouse location
-        private void FindLocalPoint(List<List<Point>> PointsAll, Point MouseLocation)
+        private void FindLocalPoint(List<List<PointF>> PointsAll, PointF MouseLocation)
         {
             const int localRadius = 7; // radius of neiborghood, used when selecting a point with mouse; chosen arbitrary
 
@@ -1689,7 +1685,7 @@ namespace BezierTool
         // Calculate control points for interpolated curves - <4 pPoints> and <Least Squares>.
         private void AddcPointsInterpolation(int i)
         {
-            List<Point> pList = pPointsAll[i];
+            List<PointF> pList = pPointsAll[i];
 
             // This method of curve fitting uses least squares method, so that distance errors from given knot points to the Bezier curve 
             // at respective t values is the smallest possible. 
@@ -1752,11 +1748,11 @@ namespace BezierTool
             // if this is the first time calculating control points
             if (cPointsAll[i] == null)
             {
-                cPoints = new List<Point>();
+                cPoints = new List<PointF>();
 
                 for (int j = 0; j < 4; j++)
                 {
-                    Point tmp = new Point(Convert.ToInt32(matrixC[j, 0]), Convert.ToInt32(matrixC[j, 1]));
+                    PointF tmp = new PointF((float)matrixC[j, 0], (float)matrixC[j, 1]);
                     cPoints.Add(tmp);
                 }
                 cPointsAll[i] = cPoints;
@@ -1767,7 +1763,7 @@ namespace BezierTool
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    Point tmp = new Point(Convert.ToInt32(matrixC[j, 0]), Convert.ToInt32(matrixC[j, 1]));
+                    PointF tmp = new PointF((float)matrixC[j, 0], (float)matrixC[j, 1]);
                     cPointsAll[i][j] = tmp;
                 }
             }
@@ -1777,7 +1773,7 @@ namespace BezierTool
 
 
         // Bezier curve parametrization method where t values are equally spaced.
-        private List<double> GetsValuesUniform(List<Point> pList)
+        private List<double> GetsValuesUniform(List<PointF> pList)
         {
             List<double> sValues = new List<double>();
 
@@ -1791,7 +1787,7 @@ namespace BezierTool
 
 
         // Bezier curve parametrization method where t values are aligned with distance along the polygon of control points.
-        private List<double> GetsValuesChord(List<Point> pList)
+        private List<double> GetsValuesChord(List<PointF> pList)
         {
             // At the first point, we're fixing t = 0, at the last point t = 1. Anywhere in between t value is equal to the distance
             // along the polygon scaled to the [0,1] domain.
@@ -1818,7 +1814,7 @@ namespace BezierTool
 
 
         // Bezier curve parametrization method where t values are aligned with square root of the distance along the polygon.
-        private List<double> GetsValuesCentripetal(List<Point> pList)
+        private List<double> GetsValuesCentripetal(List<PointF> pList)
         {
             // At the first point, we're fixing t = 0, at the last point t = 1. Anywhere in between t value is equal to the
             // square root of the distance along the polygon scaled to the [0,1] domain.
@@ -1862,17 +1858,17 @@ namespace BezierTool
 
 
         // Get length between two points
-        private double GetLength(Point firstPoint, Point secondPoint)
+        private float GetLength(PointF firstPoint, PointF secondPoint)
         {
-            return Math.Sqrt(Math.Pow(firstPoint.X - secondPoint.X, 2) + Math.Pow(firstPoint.Y - secondPoint.Y, 2));
+            return (float)Math.Sqrt(Math.Pow(firstPoint.X - secondPoint.X, 2) + Math.Pow(firstPoint.Y - secondPoint.Y, 2));
         }
 
 
         // Choose a .txt file and output a list of points from it.
-        private List<Point> GetPointsfromFile()
+        private List<PointF> GetPointsfromFile()
         {
-            List<Point> pointList = new List<Point>();
-            Point point = new Point();
+            List<PointF> pointList = new List<PointF>();
+            PointF point = new PointF();
 
             string path = "";
             string textLine = "";
@@ -1910,8 +1906,8 @@ namespace BezierTool
 
                         try
                         {
-                            point.X = Convert.ToInt32(xCoordinate);
-                            point.Y = Convert.ToInt32(yCoordinate);
+                            point.X = Convert.ToSingle(xCoordinate);
+                            point.Y = Convert.ToSingle(yCoordinate);
                         }
 
                         catch (Exception)
@@ -1933,9 +1929,9 @@ namespace BezierTool
 
             for (int i = 0; i < pointList.Count; i++)
             {
-                Point tmp = new Point();
-                tmp.X = Convert.ToInt32(pointList[i].X / scalePropX - shiftVector.X);
-                tmp.Y = Convert.ToInt32(pointList[i].Y / scalePropY - shiftVector.Y);
+                PointF tmp = new PointF();
+                tmp.X = pointList[i].X / scalePropX - shiftVector.X;
+                tmp.Y = pointList[i].Y / scalePropY - shiftVector.Y;
 
                 pointList[i] = tmp;
             }
@@ -1944,7 +1940,7 @@ namespace BezierTool
         }
 
 
-        private void OutputPointsToFile(List<Point> pointList)
+        private void OutputPointsToFile(List<PointF> pointList)
         {
             int i = localPoint.Item1;
             string folderPath = "";
@@ -1978,10 +1974,10 @@ namespace BezierTool
 
                 for (int j = 0; j < pointList.Count; j++)
                 {
-                    int scaleX = Convert.ToInt32((pointList[j].X + shiftVector.X) * scalePropX);
-                    int scaleY = Convert.ToInt32((pointList[j].Y + shiftVector.Y) * scalePropY);
+                    float scaledX = (pointList[j].X + shiftVector.X) * scalePropX;
+                    float scaledY = (pointList[j].Y + shiftVector.Y) * scalePropY;
 
-                    string line = "C" + (j + 1) + ": (" + scaleX + "; " + scaleY + ")"; // in each line write coordinates of one control point
+                    string line = "C" + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
                     file.WriteLine(line);
                 }
 
@@ -2022,15 +2018,10 @@ namespace BezierTool
         //???
         private void nudZoom_ValueChanged(object sender, EventArgs e)
         {
-            zoomAmount = Convert.ToDouble(nudZoom.Value / 100);
+            zoomAmount = (float)nudZoom.Value / 100;
             
             pbCanva.Width = Convert.ToInt32(zoomAmount * (pnlCanva.Width - 5));
             pbCanva.Height = Convert.ToInt32(zoomAmount * pnlCanva.Height);
-            
-            Point tmp = new Point();
-            tmp.X = (pnlCanva.Width - pbCanva.Width) / 2 - 1;
-            tmp.Y = (pnlCanva.Height - pbCanva.Height) / 2 - 1;
-            //pbCanva.Location = tmp;
 
 
             if (zoomAmount > 1)
@@ -2052,7 +2043,7 @@ namespace BezierTool
         {
             ButtonPress();
             isSettingScale = true;
-            scalePoints = new List<Point>();
+            scalePoints = new List<PointF>();
             FormCoordinates.scaleReal = null;
             SetScale();
             pbCanva.Invalidate();
