@@ -60,9 +60,9 @@ namespace BezierTool
 
         bool isSettingScale = false;
         List<Point> scalePoints = new List<Point>();
-        double scalePropX = 1;
-        double scalePropY = 1;
-        Point shiftVector = new Point(0,0);
+        public static double scalePropX = 1;
+        public static double scalePropY = 1;
+        public static Point shiftVector = new Point(0,0);
 
         List<Color> curveColor = new List<Color>();
         Color lastColor = Color.Black;
@@ -163,7 +163,7 @@ namespace BezierTool
                 // output to .txt file
                 if (rbFileOutput.Checked == true)
                 {
-                    OutputcPointsToFile();
+                    OutputPointsToFile(cPointsAll[i]);
                 }
 
                 outputPointType = BezierType.Nothing;
@@ -195,7 +195,7 @@ namespace BezierTool
                 // output to .txt file
                 else if (rbFileOutput.Checked == true)
                 {
-                    OutputpPointsToFile();
+                    OutputPointsToFile(pPointsAll[i]);
                 }
 
                 outputPointType = BezierType.Nothing;
@@ -485,11 +485,7 @@ namespace BezierTool
             {
                 foreach (Point dPoint in dPointsZoom)
                 {
-                    Point tmp = new Point();
-                    tmp.X = Convert.ToInt32(dPoint.X / scalePropX - shiftVector.X);
-                    tmp.Y = Convert.ToInt32(dPoint.Y / scalePropY - shiftVector.Y);
-
-                    e.Graphics.FillEllipse(dPointBrush, tmp.X - pointRadius, tmp.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
+                    e.Graphics.FillEllipse(dPointBrush, dPoint.X - pointRadius, dPoint.Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                 }
             }
 
@@ -503,7 +499,7 @@ namespace BezierTool
             if (cPoints != null)
             {
                 // <4 cPoints> curves can't have more than 4 control points
-                if (cPoints.Count < 4 && addType == BezierType.cPoints)
+                if (cPoints.Count < 4 && addType == BezierType.cPoints && rbMouseInput.Checked == true)
                 {
                     Point tmp = new Point();
                     tmp.X = Convert.ToInt32( cPoints[cPoints.Count - 1].X * zoomAmount);
@@ -726,6 +722,18 @@ namespace BezierTool
             
             lblError.Text = "" + scalePropX + " " + scalePropY + " " + shiftVector;
 
+            if (DefaultForm.dPoints != null)
+            {
+                for (int i = 0; i < DefaultForm.dPoints.Count; i++)
+                {
+                    Point tmp = new Point();
+                    tmp.X = Convert.ToInt32(DefaultForm.dPoints[i].X / scalePropX - shiftVector.X);
+                    tmp.Y = Convert.ToInt32(DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y);
+
+                    DefaultForm.dPoints[i] = tmp;
+                }
+            }
+
             pbCanva.Invalidate();
         }
 
@@ -905,7 +913,6 @@ namespace BezierTool
                 {
                     lblError.ForeColor = Color.Red;
                     lblError.Text = "Error: .txt file was not correct!";
-                    DeleteCurve(allCurves.Count - 1);  // reverse the actions of newCurve() function
                     return;
                 }
 
@@ -955,7 +962,6 @@ namespace BezierTool
                 {
                     lblError.ForeColor = Color.Red;
                     lblError.Text = "Error: .txt file was not correct!";
-                    DeleteCurve(allCurves.Count - 1);  // reverse the actions of newCurve() function
                     return;
                 }
 
@@ -1103,8 +1109,14 @@ namespace BezierTool
             cPointsAll = new List<List<Point>>();
             pPointsAll = new List<List<Point>>();
 
+            scalePropX = 1;
+            scalePropY = 1;
+            shiftVector = new Point(0, 0);
+            FormCoordinates.scaleReal = null;
+
             cPoints = null;
             pPoints = null;
+            scalePoints = null;
             localPoint = null;
 
             rbMouseInput.Checked = true;
@@ -1919,16 +1931,32 @@ namespace BezierTool
                 MessageBox.Show("File upload error!");
             }
 
+            for (int i = 0; i < pointList.Count; i++)
+            {
+                Point tmp = new Point();
+                tmp.X = Convert.ToInt32(pointList[i].X / scalePropX - shiftVector.X);
+                tmp.Y = Convert.ToInt32(pointList[i].Y / scalePropY - shiftVector.Y);
+
+                pointList[i] = tmp;
+            }
+
             return pointList;
         }
 
 
-        // Output coordinates of control points to .txt file.
-        private void OutputcPointsToFile()
+        private void OutputPointsToFile(List<Point> pointList)
         {
             int i = localPoint.Item1;
-
             string folderPath = "";
+
+            if (outputPointType == BezierType.cPoints)
+            {
+                pointList = cPointsAll[i];
+            }
+            else
+            {
+                pointList = pPointsAll[i];
+            }
 
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -1945,55 +1973,20 @@ namespace BezierTool
             string path = Path.Combine(folderPath, "points.txt");
             using (var file = new StreamWriter(path, true))
             {
-                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")); // write date and time in the first curve
+                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")); // write date and time in the first line
                 file.WriteLine("<" + allCurves[i] + "> curve: \n");
 
-                for (int j = 0; j < cPointsAll[i].Count; j++)
+                for (int j = 0; j < pointList.Count; j++)
                 {
-                    string tmp = "C" + (j + 1) + ": (" + cPointsAll[i][j].X + "; " + cPointsAll[i][j].Y + ")"; // in each curve write coordinates of one control point
-                    file.WriteLine(tmp);
+                    int scaleX = Convert.ToInt32((pointList[j].X + shiftVector.X) * scalePropX);
+                    int scaleY = Convert.ToInt32((pointList[j].Y + shiftVector.Y) * scalePropY);
+
+                    string line = "C" + (j + 1) + ": (" + scaleX + "; " + scaleY + ")"; // in each line write coordinates of one control point
+                    file.WriteLine(line);
                 }
 
                 file.WriteLine("\n \n");
             }
-        }
-
-
-        // Output coordinates of knot points to .txt file.
-        private void OutputpPointsToFile()
-        {
-            int i = localPoint.Item1;
-
-            string folderPath = "";
-
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                folderPath = dialog.SelectedPath;
-            }
-
-            else
-            {
-                lblError.ForeColor = Color.Red;
-                lblError.Text = "Error: Output error!";
-            }
-
-            string path = Path.Combine(folderPath, "points.txt");
-            using (var file = new StreamWriter(path, true))
-            {
-                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")); // write date and time in the first curve
-                file.WriteLine("<" + allCurves[i] + "> curve: \n");
-
-                for (int j = 0; j < pPointsAll[i].Count; j++)
-                {
-                    string tmp = "P" + (j + 1) + ": (" + pPointsAll[i][j].X + "; " + pPointsAll[i][j].Y + ")"; // in each curve write coordinates of one knot point
-                    file.WriteLine(tmp);
-                }
-
-                file.WriteLine("\n \n");
-            }
-
-            return;
         }
 
 
@@ -2060,6 +2053,7 @@ namespace BezierTool
             ButtonPress();
             isSettingScale = true;
             scalePoints = new List<Point>();
+            FormCoordinates.scaleReal = null;
             SetScale();
             pbCanva.Invalidate();
         }

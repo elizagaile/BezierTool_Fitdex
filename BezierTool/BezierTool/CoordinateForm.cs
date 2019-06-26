@@ -145,6 +145,39 @@ namespace BezierTool
             return;
         }
 
+
+        private List<Point> ScaleInputPoints(List<Point> pointList)
+        {
+            List<Point> scaleList = new List<Point>();
+
+            for (int i = 0; i < pointList.Count; i++)
+            {
+                Point tmp = new Point();
+                tmp.X = Convert.ToInt32(pointList[i].X / FormMain.scalePropX - FormMain.shiftVector.X);
+                tmp.Y = Convert.ToInt32(pointList[i].Y / FormMain.scalePropY - FormMain.shiftVector.Y);
+
+                scaleList.Add(tmp);
+            }
+
+            return scaleList;
+        }
+
+        private List<Point> ScaleOutputPoints(List<Point> pointList)
+        {
+            List<Point> scaleList = new List<Point>();
+
+            for (int i = 0; i< pointList.Count; i++)
+            {
+                Point tmp = new Point();
+                tmp.X = Convert.ToInt32((pointList[i].X + FormMain.shiftVector.X) * FormMain.scalePropX);
+                tmp.Y = Convert.ToInt32((pointList[i].Y + FormMain.shiftVector.Y) * FormMain.scalePropY);
+
+                scaleList.Add(tmp);
+            }
+
+            return scaleList;
+        }
+
         private void InitializeOutput()
         //initialize form for outputting line coordinates
         {
@@ -162,14 +195,14 @@ namespace BezierTool
             {
                 gbCoordinates.Text = "List of <" + curveType + "> control point coordinates:";
                 labelType = "C";
-                pointList = FormMain.cPointsAll[i];
+                pointList = ScaleOutputPoints(FormMain.cPointsAll[i]);
             }
 
             else if (FormMain.outputPointType == FormMain.BezierType.pPoints)
             {
                 gbCoordinates.Text = "List of <" + curveType + "> knot point coordinates:";
                 labelType = "P";
-                pointList = FormMain.pPointsAll[i];
+                pointList = ScaleOutputPoints(FormMain.pPointsAll[i]);
             }
 
             for (int j = 0; j < pointList.Count; j++)
@@ -278,8 +311,15 @@ namespace BezierTool
                 pointList.Add(tmp);
             }
 
+
             if (formType == FormMain.FormType.Scale)
             {
+                if (pointList[0].X == pointList[1].X && pointList[0].Y == pointList[1].Y)
+                {
+                    MessageBox.Show("Values must be different!");
+                    return;
+                }
+
                 scaleReal = new Tuple<Point, Point>(pointList[0], pointList[1]);
 
                 this.Close();
@@ -302,25 +342,25 @@ namespace BezierTool
 
             if (curveType == FormMain.BezierType.cPoints)
             {
-                FormMain.cPointsAll[i] = pointList;
+                FormMain.cPointsAll[i] = ScaleInputPoints(pointList);
                 curveAdded = true; //line was added successfully
             }
 
             else if (curveType == FormMain.BezierType.pPoints || curveType == FormMain.BezierType.LeastSquares)
             {
-                FormMain.pPointsAll[i] = pointList;
+                FormMain.pPointsAll[i] = ScaleInputPoints(pointList);
                 curveAdded = true; //curve was added successfully
             }
 
             else if (curveType == FormMain.BezierType.Composite && formType == FormMain.FormType.Add)
             {
-                FormMain.pPointsAll[i] = pointList;
+                FormMain.pPointsAll[i] = ScaleInputPoints(pointList);
                 curveAdded = true; //curve was added successfully
             }
 
             else if (curveType == FormMain.BezierType.Composite && formType == FormMain.FormType.Modify)
             {
-                FormMain.ModifypPointComposite(pointList[0]);
+                FormMain.ModifypPointComposite(ScaleInputPoints(pointList)[0]);
             }
             
             this.Close();
