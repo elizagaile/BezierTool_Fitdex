@@ -19,7 +19,7 @@ namespace BezierTool
         // the i-th drawn curve is represented by the i-th position in all of the lists
 
         // all possible construction types of curves:
-        public enum BezierType { cPoints, pPoints, LeastSquares, Composite, Nothing }; 
+        public enum BezierType { cPoints, pPoints, LeastSquares, Composite, LineSegment, Nothing }; 
         public static List<BezierType> allCurves = new List<BezierType>();
 
         public static List<List<PointF>> cPointsAll = new List<List<PointF>>();
@@ -60,8 +60,8 @@ namespace BezierTool
 
         bool isSettingScale = false;
         List<PointF> scalePoints = new List<PointF>();
-        public static float scalePropX = 1;
-        public static float scalePropY = 1;
+        public static float scalePropX = 1 / (float)36.6; //for default screens at work
+        public static float scalePropY = 1 / (float)36.6;
         public static PointF shiftVector = new PointF(0,0);
 
         List<Color> curveColor = new List<Color>();
@@ -73,6 +73,8 @@ namespace BezierTool
         List<List<PointF>> cPointsZoom = new List<List<PointF>>();
         List<List<PointF>> pPointsZoom = new List<List<PointF>>();
         List<PointF> dPointsZoom = new List<PointF>();
+
+        List<Tuple<PointF, PointF>> lineSegments = new List<Tuple<PointF, PointF>>();
 
         public FormMain()
         {
@@ -90,6 +92,14 @@ namespace BezierTool
             PointF eZoom = new PointF();
             eZoom.X = e.X / zoomAmount;
             eZoom.Y = e.Y / zoomAmount;
+
+            if(addType == BezierType.LineSegment && rbMouseInput.Checked == true)
+            {
+                if(lineSegments[lineSegments.Count - 1] == null)
+                {
+
+                }
+            }
 
             // addding a new control point with mouse for <4 cPoints> curve
             if (addType == BezierType.cPoints && rbMouseInput.Checked == true)
@@ -777,6 +787,16 @@ namespace BezierTool
             }
         }
 
+        private void btnNewSegment_Click(object sender, EventArgs e)
+        {
+            ButtonPress();
+            addType = BezierType.LineSegment;
+
+            if(rbMouseInput.Checked == true)
+            {
+                lineSegments.Add(null);
+            }
+        }
 
         // Start a new <4 cPoints> curve.
         private void btnNew4cPoints_Click(object sender, EventArgs e)
@@ -1107,8 +1127,8 @@ namespace BezierTool
             cPointsAll = new List<List<PointF>>();
             pPointsAll = new List<List<PointF>>();
 
-            scalePropX = 1;
-            scalePropY = 1;
+            scalePropX = 1 / (float)36.6;
+            scalePropY = 1 / (float)36.6;
             shiftVector = new PointF(0, 0);
             FormCoordinates.scaleReal = null;
 
@@ -2048,5 +2068,7 @@ namespace BezierTool
             SetScale();
             pbCanva.Invalidate();
         }
+
+
     }
 }

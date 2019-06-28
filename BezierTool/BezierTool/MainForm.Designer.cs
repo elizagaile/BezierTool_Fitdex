@@ -66,6 +66,7 @@
             this.nudZoom = new System.Windows.Forms.NumericUpDown();
             this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
+            this.btnNewSegment = new System.Windows.Forms.Button();
             this.btnDeleteCurve = new System.Windows.Forms.Button();
             this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnChangeColor = new System.Windows.Forms.Button();
@@ -104,7 +105,7 @@
             // 
             // btnUploadBackground
             // 
-            this.btnUploadBackground.Location = new System.Drawing.Point(9, 587);
+            this.btnUploadBackground.Location = new System.Drawing.Point(9, 627);
             this.btnUploadBackground.Name = "btnUploadBackground";
             this.btnUploadBackground.Size = new System.Drawing.Size(314, 37);
             this.btnUploadBackground.TabIndex = 1;
@@ -207,7 +208,7 @@
             // cbShowBackground
             // 
             this.cbShowBackground.AutoSize = true;
-            this.cbShowBackground.Location = new System.Drawing.Point(9, 629);
+            this.cbShowBackground.Location = new System.Drawing.Point(9, 670);
             this.cbShowBackground.Name = "cbShowBackground";
             this.cbShowBackground.Size = new System.Drawing.Size(165, 24);
             this.cbShowBackground.TabIndex = 13;
@@ -276,7 +277,7 @@
             this.groupAddType.Controls.Add(this.btnNew4pPoints);
             this.groupAddType.Controls.Add(this.btnNewLeastSquares);
             this.groupAddType.Controls.Add(this.btnNewComposite);
-            this.groupAddType.Location = new System.Drawing.Point(3, 3);
+            this.groupAddType.Location = new System.Drawing.Point(3, 46);
             this.groupAddType.Name = "groupAddType";
             this.groupAddType.Size = new System.Drawing.Size(171, 252);
             this.groupAddType.TabIndex = 20;
@@ -297,7 +298,7 @@
             // 
             this.groupModifyType.Controls.Add(this.btnModifycPoints);
             this.groupModifyType.Controls.Add(this.btnModifypPoints);
-            this.groupModifyType.Location = new System.Drawing.Point(3, 261);
+            this.groupModifyType.Location = new System.Drawing.Point(3, 301);
             this.groupModifyType.Name = "groupModifyType";
             this.groupModifyType.Size = new System.Drawing.Size(171, 114);
             this.groupModifyType.TabIndex = 21;
@@ -308,9 +309,9 @@
             // 
             this.groupModifyInput.Controls.Add(this.rbMouseModify);
             this.groupModifyInput.Controls.Add(this.rbKeyboardModify);
-            this.groupModifyInput.Location = new System.Drawing.Point(180, 288);
+            this.groupModifyInput.Location = new System.Drawing.Point(180, 301);
             this.groupModifyInput.Name = "groupModifyInput";
-            this.groupModifyInput.Size = new System.Drawing.Size(146, 87);
+            this.groupModifyInput.Size = new System.Drawing.Size(146, 114);
             this.groupModifyInput.TabIndex = 22;
             this.groupModifyInput.TabStop = false;
             this.groupModifyInput.Text = "Modify points:";
@@ -323,7 +324,7 @@
             this.groupParamType.Controls.Add(this.rbUniform);
             this.groupParamType.Location = new System.Drawing.Point(180, 124);
             this.groupParamType.Name = "groupParamType";
-            this.groupParamType.Size = new System.Drawing.Size(146, 158);
+            this.groupParamType.Size = new System.Drawing.Size(146, 174);
             this.groupParamType.TabIndex = 24;
             this.groupParamType.TabStop = false;
             this.groupParamType.Text = "Paramterization:";
@@ -387,7 +388,7 @@
             // 
             this.groupGetCoordinates.Controls.Add(this.btnOutputpPoints);
             this.groupGetCoordinates.Controls.Add(this.btnOutputcPoints);
-            this.groupGetCoordinates.Location = new System.Drawing.Point(3, 381);
+            this.groupGetCoordinates.Location = new System.Drawing.Point(3, 421);
             this.groupGetCoordinates.Name = "groupGetCoordinates";
             this.groupGetCoordinates.Size = new System.Drawing.Size(171, 114);
             this.groupGetCoordinates.TabIndex = 26;
@@ -408,7 +409,7 @@
             // 
             this.groupOutput.Controls.Add(this.rbFileOutput);
             this.groupOutput.Controls.Add(this.rbScreenOutput);
-            this.groupOutput.Location = new System.Drawing.Point(180, 381);
+            this.groupOutput.Location = new System.Drawing.Point(180, 421);
             this.groupOutput.Name = "groupOutput";
             this.groupOutput.Size = new System.Drawing.Size(146, 114);
             this.groupOutput.TabIndex = 27;
@@ -500,7 +501,7 @@
             this.cbShowcPoints.AutoSize = true;
             this.cbShowcPoints.Checked = true;
             this.cbShowcPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbShowcPoints.Location = new System.Drawing.Point(192, 629);
+            this.cbShowcPoints.Location = new System.Drawing.Point(180, 670);
             this.cbShowcPoints.Name = "cbShowcPoints";
             this.cbShowcPoints.Size = new System.Drawing.Size(131, 24);
             this.cbShowcPoints.TabIndex = 36;
@@ -510,6 +511,7 @@
             // 
             // panel_tools
             // 
+            this.panel_tools.Controls.Add(this.btnNewSegment);
             this.panel_tools.Controls.Add(this.cbShowcPoints);
             this.panel_tools.Controls.Add(this.btnUploadBackground);
             this.panel_tools.Controls.Add(this.btnDeleteCurve);
@@ -523,14 +525,24 @@
             this.panel_tools.Controls.Add(this.btnChangeColor);
             this.panel_tools.Controls.Add(this.groupModifyInput);
             this.panel_tools.Controls.Add(this.groupGetCoordinates);
-            this.panel_tools.Location = new System.Drawing.Point(1115, 13);
+            this.panel_tools.Location = new System.Drawing.Point(1118, 17);
             this.panel_tools.Name = "panel_tools";
-            this.panel_tools.Size = new System.Drawing.Size(330, 736);
+            this.panel_tools.Size = new System.Drawing.Size(330, 742);
             this.panel_tools.TabIndex = 32;
+            // 
+            // btnNewSegment
+            // 
+            this.btnNewSegment.Location = new System.Drawing.Point(9, 3);
+            this.btnNewSegment.Name = "btnNewSegment";
+            this.btnNewSegment.Size = new System.Drawing.Size(159, 37);
+            this.btnNewSegment.TabIndex = 41;
+            this.btnNewSegment.Text = "Line Segment";
+            this.btnNewSegment.UseVisualStyleBackColor = true;
+            this.btnNewSegment.Click += new System.EventHandler(this.btnNewSegment_Click);
             // 
             // btnDeleteCurve
             // 
-            this.btnDeleteCurve.Location = new System.Drawing.Point(9, 544);
+            this.btnDeleteCurve.Location = new System.Drawing.Point(9, 584);
             this.btnDeleteCurve.Name = "btnDeleteCurve";
             this.btnDeleteCurve.Size = new System.Drawing.Size(314, 37);
             this.btnDeleteCurve.TabIndex = 31;
@@ -541,15 +553,15 @@
             // pnlLastColor
             // 
             this.pnlLastColor.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.pnlLastColor.Location = new System.Drawing.Point(180, 501);
+            this.pnlLastColor.Location = new System.Drawing.Point(174, 541);
             this.pnlLastColor.Name = "pnlLastColor";
-            this.pnlLastColor.Size = new System.Drawing.Size(145, 37);
+            this.pnlLastColor.Size = new System.Drawing.Size(146, 37);
             this.pnlLastColor.TabIndex = 37;
             this.pnlLastColor.Click += new System.EventHandler(this.pnlLastColor_Click);
             // 
             // btnChangeColor
             // 
-            this.btnChangeColor.Location = new System.Drawing.Point(9, 501);
+            this.btnChangeColor.Location = new System.Drawing.Point(9, 541);
             this.btnChangeColor.Name = "btnChangeColor";
             this.btnChangeColor.Size = new System.Drawing.Size(159, 37);
             this.btnChangeColor.TabIndex = 36;
@@ -669,6 +681,7 @@
         private System.Windows.Forms.Label lblZoom;
         private System.Windows.Forms.Panel pnlMessage;
         private System.Windows.Forms.Button btnSetScale;
+        private System.Windows.Forms.Button btnNewSegment;
     }
 }
 
