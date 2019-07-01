@@ -67,13 +67,14 @@
             this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
             this.btnNewSegment = new System.Windows.Forms.Button();
-            this.btnDeleteCurve = new System.Windows.Forms.Button();
+            this.btnDeleteObject = new System.Windows.Forms.Button();
             this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnChangeColor = new System.Windows.Forms.Button();
             this.pnlCanva = new System.Windows.Forms.Panel();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.lblZoom = new System.Windows.Forms.Label();
             this.pnlMessage = new System.Windows.Forms.Panel();
+            this.btnExportAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbCanva)).BeginInit();
             this.groupAddInputType.SuspendLayout();
             this.groupAddType.SuspendLayout();
@@ -511,10 +512,11 @@
             // 
             // panel_tools
             // 
+            this.panel_tools.Controls.Add(this.btnExportAll);
             this.panel_tools.Controls.Add(this.btnNewSegment);
             this.panel_tools.Controls.Add(this.cbShowcPoints);
             this.panel_tools.Controls.Add(this.btnUploadBackground);
-            this.panel_tools.Controls.Add(this.btnDeleteCurve);
+            this.panel_tools.Controls.Add(this.btnDeleteObject);
             this.panel_tools.Controls.Add(this.groupAddType);
             this.panel_tools.Controls.Add(this.pnlLastColor);
             this.panel_tools.Controls.Add(this.cbShowBackground);
@@ -527,7 +529,7 @@
             this.panel_tools.Controls.Add(this.groupGetCoordinates);
             this.panel_tools.Location = new System.Drawing.Point(1118, 17);
             this.panel_tools.Name = "panel_tools";
-            this.panel_tools.Size = new System.Drawing.Size(330, 742);
+            this.panel_tools.Size = new System.Drawing.Size(330, 773);
             this.panel_tools.TabIndex = 32;
             // 
             // btnNewSegment
@@ -540,15 +542,15 @@
             this.btnNewSegment.UseVisualStyleBackColor = true;
             this.btnNewSegment.Click += new System.EventHandler(this.btnNewSegment_Click);
             // 
-            // btnDeleteCurve
+            // btnDeleteObject
             // 
-            this.btnDeleteCurve.Location = new System.Drawing.Point(9, 584);
-            this.btnDeleteCurve.Name = "btnDeleteCurve";
-            this.btnDeleteCurve.Size = new System.Drawing.Size(314, 37);
-            this.btnDeleteCurve.TabIndex = 31;
-            this.btnDeleteCurve.Text = "Choose Curve to Delete";
-            this.btnDeleteCurve.UseVisualStyleBackColor = true;
-            this.btnDeleteCurve.Click += new System.EventHandler(this.btnDeleteCurve_Click);
+            this.btnDeleteObject.Location = new System.Drawing.Point(9, 584);
+            this.btnDeleteObject.Name = "btnDeleteObject";
+            this.btnDeleteObject.Size = new System.Drawing.Size(314, 37);
+            this.btnDeleteObject.TabIndex = 31;
+            this.btnDeleteObject.Text = "Choose Object to Delete";
+            this.btnDeleteObject.UseVisualStyleBackColor = true;
+            this.btnDeleteObject.Click += new System.EventHandler(this.btnDeleteCurve_Click);
             // 
             // pnlLastColor
             // 
@@ -598,6 +600,16 @@
             this.pnlMessage.Name = "pnlMessage";
             this.pnlMessage.Size = new System.Drawing.Size(1429, 28);
             this.pnlMessage.TabIndex = 40;
+            // 
+            // btnExportAll
+            // 
+            this.btnExportAll.Location = new System.Drawing.Point(168, 733);
+            this.btnExportAll.Name = "btnExportAll";
+            this.btnExportAll.Size = new System.Drawing.Size(159, 37);
+            this.btnExportAll.TabIndex = 41;
+            this.btnExportAll.Text = "Export All";
+            this.btnExportAll.UseVisualStyleBackColor = true;
+            this.btnExportAll.Click += new System.EventHandler(this.btnExportAll_Click);
             // 
             // FormMain
             // 
@@ -670,7 +682,7 @@
         private System.Windows.Forms.Panel panel_bottom;
         private System.Windows.Forms.Panel panel_tools;
         private System.Windows.Forms.RadioButton rbCentripetal;
-        private System.Windows.Forms.Button btnDeleteCurve;
+        private System.Windows.Forms.Button btnDeleteObject;
         private System.Windows.Forms.Panel pnlCanva;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Panel pnlLastColor;
@@ -682,6 +694,7 @@
         private System.Windows.Forms.Panel pnlMessage;
         private System.Windows.Forms.Button btnSetScale;
         private System.Windows.Forms.Button btnNewSegment;
+        private System.Windows.Forms.Button btnExportAll;
     }
 }
 

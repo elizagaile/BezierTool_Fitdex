@@ -16,7 +16,7 @@ namespace BezierTool
         public static bool curveAdded = false; //to determine if a curve was added successfully
         public static Tuple<PointF, PointF> scaleReal = null;
 
-        public FormCoordinates( FormMain.FormType thisFormType, FormMain.BezierType thisCurveType)
+        public FormCoordinates(FormMain.FormType thisFormType, FormMain.BezierType thisCurveType)
             //initialization
         {
             InitializeComponent();
@@ -55,21 +55,36 @@ namespace BezierTool
             //initialize form for adding a new curve
         {
             this.Text = "New <" + curveType + "> curve";
+            
+            if (curveType == FormMain.BezierType.LineSegment)
+            {
+                labelType = "Nr";
+                gbCoordinates.Text = "Input endpoints of the line segment:";
+                btnAddRow.Visible = false;
+                btnDeleteRow.Visible = false;
 
-            if (curveType == FormMain.BezierType.cPoints)
+                for (int i = 0; i < 2; i++)
+                {
+                    AddRow();
+                }
+            }
+
+            else if (curveType == FormMain.BezierType.cPoints)
             {
                 labelType = "C";
+                for (int i = 0; i < 4; i++)
+                {
+                    AddRow();
+                }
             }
 
             else if (curveType == FormMain.BezierType.pPoints || curveType == FormMain.BezierType.LeastSquares || curveType == FormMain.BezierType.Composite)
             {
                 labelType = "P";
-            }
-
-            for (int i = 0; i < 4; i++)
-            //start with 4 points for every curve type
-            {
-                AddRow();
+                for (int i = 0; i < 4; i++)
+                {
+                    AddRow();
+                }
             }
 
             if (curveType == FormMain.BezierType.cPoints || curveType == FormMain.BezierType.pPoints)
@@ -80,7 +95,7 @@ namespace BezierTool
                 btnDeleteRow.Visible = false;
             }
 
-            if (curveType == FormMain.BezierType.LeastSquares || curveType == FormMain.BezierType.Composite)
+            else if (curveType == FormMain.BezierType.LeastSquares || curveType == FormMain.BezierType.Composite)
             //Count of <Least Squares> and <Composite> input point count can vary; its possible to add and delete input lines
             {
                 gbCoordinates.Text = "Input <" + curveType + "> knot point coordinates:";
@@ -305,7 +320,7 @@ namespace BezierTool
             //put all values from textboxes to list of control points
             {
                 x = float.Parse(coordinates[j].Text);
-                y = Convert.ToInt32(coordinates[j + 1].Text);
+                y = float.Parse(coordinates[j + 1].Text);
                 PointF tmp = new PointF(x, y);
 
                 pointList.Add(tmp);
@@ -340,7 +355,7 @@ namespace BezierTool
                 i = FormMain.localPoint.Item1;
             }
 
-            if (curveType == FormMain.BezierType.cPoints)
+            if (curveType == FormMain.BezierType.cPoints || curveType == FormMain.BezierType.LineSegment)
             {
                 FormMain.cPointsAll[i] = ScaleInputPoints(pointList);
                 curveAdded = true; //line was added successfully
