@@ -29,60 +29,72 @@ namespace BezierTool
 
         private void btndPointsAdd_Click(object sender, EventArgs e)
         {
-                PointF point = new PointF();
+            PointF point = new PointF();
 
-                string path = "";
-                string textLine = "";
+            string path = "";
+            string textLine = "";
 
-                try
+            try
+            {
+                OpenFileDialog dialog = new OpenFileDialog
                 {
-                    OpenFileDialog dialog = new OpenFileDialog
-                    {
-                        Title = "Open Text File",
-                        Filter = "TXT files|*.txt", // only .txt files are supported
-                        InitialDirectory = @"C:\"
-                    };
+                    Title = "Open Text File",
+                    Filter = "TXT files|*.txt", // only .txt files are supported
+                    InitialDirectory = @"C:\"
+                };
 
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        path = dialog.FileName;
-                    }
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    path = dialog.FileName;
                 }
+            }
 
-                catch (Exception)
-                {
-                    MessageBox.Show("File upload error!");
-                }
+            catch (Exception)
+            {
+                MessageBox.Show("File upload error!");
+            }
 
-                if (File.Exists(path))
+            if (File.Exists(path))
+            {
+                using (StreamReader file = new StreamReader(path))
                 {
-                    using (StreamReader file = new StreamReader(path))
+                    while ((textLine = file.ReadLine()) != null)
                     {
-                        while ((textLine = file.ReadLine()) != null)
+                        try
                         {
-                            try
-                            {
-                                int index = textLine.IndexOf(' ');
-                                string xCoordinate = textLine.Substring(0, index);
-                                string yCoordinate = textLine.Substring(index + 1);
-                                point.X = Convert.ToInt32(xCoordinate);
-                                point.Y = Convert.ToInt32(yCoordinate);
-                            }
-
-                            catch (Exception)
-                            {
-                            MessageBox.Show(".txt file was not correct!");
-                            }
-
-                            dPoints.Add(point);
+                            int index = textLine.IndexOf(' ');
+                            string xCoordinate = textLine.Substring(0, index);
+                            string yCoordinate = textLine.Substring(index + 1);
+                            point.X = Convert.ToInt32(xCoordinate);
+                            point.Y = Convert.ToInt32(yCoordinate);
                         }
+
+                        catch (Exception)
+                        {
+                        MessageBox.Show(".txt file was not correct!");
+                        }
+
+                        dPoints.Add(point);
                     }
                 }
+            }
 
-                else
+            else
+            {
+                MessageBox.Show("File upload error!");
+            }
+
+            if (dPoints != null)
+            {
+                for (int i = 0; i < dPoints.Count; i++)
                 {
-                    MessageBox.Show("File upload error!");
+                    PointF tmp = new PointF();
+                    tmp.X = dPoints[i].X / FormMain.scalePropX - FormMain.shiftVector.X;
+                    tmp.Y = dPoints[i].Y / FormMain.scalePropY - FormMain.shiftVector.Y;
+
+                    dPoints[i] = tmp;
                 }
+            }
 
         }
 

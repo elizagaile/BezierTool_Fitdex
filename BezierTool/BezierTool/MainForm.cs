@@ -20,7 +20,7 @@ namespace BezierTool
         // the i-th drawn curve is represented by the i-th position in all of the lists
 
         // all possible construction types of curves:
-        public enum BezierType { cPoints, pPoints, LeastSquares, Composite, LineSegment, Nothing }; 
+        public enum BezierType { cPoints, pPoints, LeastSquares, Composite, LineSegment, dPoints, Nothing }; 
         public static List<BezierType> allCurves = new List<BezierType>();
 
         public static List<List<PointF>> cPointsAll = new List<List<PointF>>();
@@ -455,6 +455,8 @@ namespace BezierTool
         // as well as calling for functions to get needed control points.
         private void pbCanva_Paint(object sender, PaintEventArgs e)
         {
+            lblError.Text = "" + allCurves.Count;
+
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // makes lines look smoother
             
             const int dashLength = 5; // describes length of dashes; chosen arbitrary
@@ -2114,32 +2116,24 @@ namespace BezierTool
             string path = "";
 
             SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "text file|*.txt";
+            dialog.Filter = "txt files|*.txt";
             dialog.Title = "Export All Objects";
-
-            if (dialog.FileName != "")
-            {
-                using (FileStream fs = File.Create(dialog.FileName))
-                {
-                   //FIX
-                }
-            }
-
-            /*
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.FileName = "BezierTool";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                path = dialog.SelectedPath;
+                if (dialog.FileName != "")
+                {
+                    FileStream fs = File.Create(dialog.FileName);
+                    path = Path.Combine(Path.GetDirectoryName(dialog.FileName), dialog.FileName);
+                    fs.Close();
+                }
             }
-            */
 
             else
             {
                 lblError.ForeColor = Color.Red;
                 lblError.Text = "Error: Output error!";
             }
-
-            path = Path.Combine(path, "BezierTool.txt");
 
             using (var file = new StreamWriter(path))
             {
@@ -2149,8 +2143,25 @@ namespace BezierTool
                 file.WriteLine("shiftVector: " + shiftVector);
                 file.WriteLine("imageLocation: " + imageLocation + "\n \n");
 
-                //dPoints FIX
-                //empty lists FIX
+                if (DefaultForm.dPoints != null)
+                {
+                    file.WriteLine("<dPoints>: \n");
+                    for (int i = 0; i < DefaultForm.dPoints.Count; i++)
+                    {
+                        double scaledX = Math.Round((DefaultForm.dPoints[i].X + shiftVector.X) * scalePropX, 4);
+                        double scaledY = Math.Round((DefaultForm.dPoints[i].Y + shiftVector.Y) * scalePropY, 4);
+
+                        string line = "D" + (i + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
+                        file.WriteLine(line);
+                    }
+                }
+
+                file.WriteLine("\n");
+
+                if (allCurves == null)
+                {
+                    return;
+                }
 
                 for (int i = 0; i < allCurves.Count; i++)
                 {
@@ -2194,6 +2205,285 @@ namespace BezierTool
 
             }
 
+        }
+
+        private void btnImportAll_Click(object sender, EventArgs e)
+        {
+            BezierType listType = BezierType.dPoints;
+            ParamType paramType = ParamType.Nothing;
+
+            List<PointF> pointList = new List<PointF>();
+            PointF point = new PointF(5,6);
+            int index;
+
+            string path = "";
+            string line = "";
+            string xText = "", yText = "", paramText = "";
+
+            try
+            {
+                OpenFileDialog dialog = new OpenFileDialog
+                {
+                    Title = "Open Text File",
+                    Filter = "TXT files|*.txt"
+                };
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    path = dialog.FileName;
+                }
+            }
+
+            catch (Exception)
+            {
+                MessageBox.Show("File upload error!");
+            }
+
+            if (File.Exists(path))
+            {
+
+
+                NewCurve(listType);
+                using (StreamReader file = new StreamReader(path))
+                {
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (line.Contains("scalePropX"))
+                        {
+                            try
+                            {
+                                scalePropX = Convert.ToSingle(line.Substring(line.IndexOf(' ')));
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("scalePropY"))
+                        {
+                            try
+                            {
+                                scalePropY = Convert.ToSingle(line.Substring(line.IndexOf(' ')));
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("shiftVector"))
+                        {
+                            try
+                            {
+                                index = line.IndexOf('X') + 2;
+                                xText = line.Substring(index, line.IndexOf(',') - index);
+                                point.X = Convert.ToSingle(xText);
+
+                                index = line.IndexOf('Y') + 2;
+                                yText = line.Substring(index, line.IndexOf('}') - index);
+                                point.Y = Convert.ToSingle(yText);
+
+                                shiftVector = point;
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("imageLocation"))
+                        {
+                            try
+                            {
+                                imageLocation = line.Substring(line.IndexOf(' ') + 1);
+                                pbCanva.ImageLocation = imageLocation;
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("<"))
+                        {
+                            if (cPoints != null)
+                            {
+                                //FIX
+                            }
+                            cPointsAll[cPointsAll.Count - 1] = cPoints;
+                            pPointsAll[pPointsAll.Count - 1] = pPoints;
+
+                            NewCurve(listType);
+
+
+
+                            if (listType == BezierType.pPoints || listType == BezierType.LeastSquares)
+                            {
+                                parametrization[parametrization.Count - 1] = paramType;
+                            }
+
+
+                            if (line.Contains("cPoints"))
+                            {
+                                listType = BezierType.cPoints;
+                            }
+                            else if (line.Contains("pPoints"))
+                            {
+                                listType = BezierType.pPoints;
+                            }
+                            else if (line.Contains("LeastSquares"))
+                            {
+                                listType = BezierType.LeastSquares;
+                            }
+                            else if (line.Contains("Composite"))
+                            {
+                                listType = BezierType.Composite;
+                            }
+                            else if (line.Contains("LineSegment"))
+                            {
+                                listType = BezierType.LineSegment;
+                            }
+
+                            if (listType == BezierType.pPoints || listType == BezierType.LeastSquares)
+                            {
+                                paramText = file.ReadLine();
+                                if (paramText == "Uniform")
+                                {
+                                    paramType = ParamType.Uniform;
+                                }
+                                else if (paramText == "Chord")
+                                {
+                                    paramType = ParamType.Chord;
+                                }
+                                else if (paramText == "Centripetal")
+                                {
+                                    paramType = ParamType.Centripetal;
+                                }
+                            }
+
+                        }
+
+                        else if (line.Contains("C"))
+                        {
+                            if (cPoints == null)
+                            {
+                                cPoints = new List<PointF>();
+                            }
+
+                            try
+                            {
+                                index = line.IndexOf('(') + 1;
+                                xText = line.Substring(index, line.IndexOf(';') - index);
+                                point.X = Convert.ToSingle(xText);
+
+                                index = line.IndexOf(';') + 2;
+                                yText = line.Substring(index, line.IndexOf(')') - index);
+                                point.Y = Convert.ToSingle(yText);
+
+                                cPoints.Add(point);
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("P"))
+                        {
+                            if (pPoints == null)
+                            {
+                                pPoints = new List<PointF>();
+                            }
+
+                            try
+                            {
+                                index = line.IndexOf('(') + 1;
+                                xText = line.Substring(index, line.IndexOf(';') - index);
+                                point.X = Convert.ToSingle(xText);
+
+                                index = line.IndexOf(';') + 2;
+                                yText = line.Substring(index, line.IndexOf(')') - index);
+                                point.Y = Convert.ToSingle(yText);
+
+                                pPoints.Add(point);
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+                    }
+                   
+
+                    
+
+                    cPointsAll[cPointsAll.Count - 1] = cPoints;
+                    pPointsAll[pPointsAll.Count - 1] = pPoints;
+                    //NewCurve(listType);
+                }
+
+
+
+
+
+
+
+
+                /*
+                    NewCurve(addType);
+                    using (StreamReader file = new StreamReader(path))
+                    {
+                        while ((textLine = file.ReadLine()) != null)
+                        {
+                            int index = textLine.IndexOf(' ');
+                            string xCoordinate = textLine.Substring(0, index);
+                            string yCoordinate = textLine.Substring(index + 1);
+
+                            try
+                            {
+                                point.X = Convert.ToSingle(xCoordinate);
+                                point.Y = Convert.ToSingle(yCoordinate);
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+
+                            pointList.Add(point);
+                        }
+                    }
+
+                */
+            }
+
+            else
+            {
+                MessageBox.Show("File upload error!");
+            }
+
+            for (int i = 0; i < pointList.Count; i++)
+            {
+                PointF tmp = new PointF();
+                tmp.X = pointList[i].X / scalePropX - shiftVector.X;
+                tmp.Y = pointList[i].Y / scalePropY - shiftVector.Y;
+
+                pointList[i] = tmp;
+            }
         }
     }
 }

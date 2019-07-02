@@ -66,6 +66,7 @@
             this.nudZoom = new System.Windows.Forms.NumericUpDown();
             this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
+            this.btnExportAll = new System.Windows.Forms.Button();
             this.btnNewSegment = new System.Windows.Forms.Button();
             this.btnDeleteObject = new System.Windows.Forms.Button();
             this.pnlLastColor = new System.Windows.Forms.Panel();
@@ -74,7 +75,7 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.lblZoom = new System.Windows.Forms.Label();
             this.pnlMessage = new System.Windows.Forms.Panel();
-            this.btnExportAll = new System.Windows.Forms.Button();
+            this.btnImportAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbCanva)).BeginInit();
             this.groupAddInputType.SuspendLayout();
             this.groupAddType.SuspendLayout();
@@ -512,6 +513,7 @@
             // 
             // panel_tools
             // 
+            this.panel_tools.Controls.Add(this.btnImportAll);
             this.panel_tools.Controls.Add(this.btnExportAll);
             this.panel_tools.Controls.Add(this.btnNewSegment);
             this.panel_tools.Controls.Add(this.cbShowcPoints);
@@ -529,8 +531,18 @@
             this.panel_tools.Controls.Add(this.groupGetCoordinates);
             this.panel_tools.Location = new System.Drawing.Point(1118, 17);
             this.panel_tools.Name = "panel_tools";
-            this.panel_tools.Size = new System.Drawing.Size(330, 773);
+            this.panel_tools.Size = new System.Drawing.Size(330, 816);
             this.panel_tools.TabIndex = 32;
+            // 
+            // btnExportAll
+            // 
+            this.btnExportAll.Location = new System.Drawing.Point(167, 776);
+            this.btnExportAll.Name = "btnExportAll";
+            this.btnExportAll.Size = new System.Drawing.Size(159, 37);
+            this.btnExportAll.TabIndex = 41;
+            this.btnExportAll.Text = "Export All";
+            this.btnExportAll.UseVisualStyleBackColor = true;
+            this.btnExportAll.Click += new System.EventHandler(this.btnExportAll_Click);
             // 
             // btnNewSegment
             // 
@@ -601,15 +613,15 @@
             this.pnlMessage.Size = new System.Drawing.Size(1429, 28);
             this.pnlMessage.TabIndex = 40;
             // 
-            // btnExportAll
+            // btnImportAll
             // 
-            this.btnExportAll.Location = new System.Drawing.Point(168, 733);
-            this.btnExportAll.Name = "btnExportAll";
-            this.btnExportAll.Size = new System.Drawing.Size(159, 37);
-            this.btnExportAll.TabIndex = 41;
-            this.btnExportAll.Text = "Export All";
-            this.btnExportAll.UseVisualStyleBackColor = true;
-            this.btnExportAll.Click += new System.EventHandler(this.btnExportAll_Click);
+            this.btnImportAll.Location = new System.Drawing.Point(167, 733);
+            this.btnImportAll.Name = "btnImportAll";
+            this.btnImportAll.Size = new System.Drawing.Size(159, 37);
+            this.btnImportAll.TabIndex = 42;
+            this.btnImportAll.Text = "Import All";
+            this.btnImportAll.UseVisualStyleBackColor = true;
+            this.btnImportAll.Click += new System.EventHandler(this.btnImportAll_Click);
             // 
             // FormMain
             // 
@@ -695,6 +707,7 @@
         private System.Windows.Forms.Button btnSetScale;
         private System.Windows.Forms.Button btnNewSegment;
         private System.Windows.Forms.Button btnExportAll;
+        private System.Windows.Forms.Button btnImportAll;
     }
 }
 
