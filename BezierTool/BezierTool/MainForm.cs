@@ -455,7 +455,15 @@ namespace BezierTool
         // as well as calling for functions to get needed control points.
         private void pbCanva_Paint(object sender, PaintEventArgs e)
         {
-            lblError.Text = "" + allCurves.Count;
+            if (allCurves!=null )
+            {
+                if (allCurves.Count > 0)
+                {
+                        lblError.Text = "" + allCurves[0];
+                }
+
+
+            }
 
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // makes lines look smoother
             
@@ -2140,8 +2148,7 @@ namespace BezierTool
                 file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "\n");
                 file.WriteLine("scalePropX: " + scalePropX);
                 file.WriteLine("scalePropY: " + scalePropY);
-                file.WriteLine("shiftVector: " + shiftVector);
-                file.WriteLine("imageLocation: " + imageLocation + "\n \n");
+                file.WriteLine("shiftVector: " + shiftVector + "\n \n");
 
                 if (DefaultForm.dPoints != null)
                 {
@@ -2172,6 +2179,11 @@ namespace BezierTool
                         file.WriteLine("" + parametrization[i]);
                     }
 
+                    if (allCurves[i] == BezierType.Composite)
+                    {
+                        file.WriteLine("" + movedCurve[i]);
+                    }
+
                     file.WriteLine();
 
                     for (int j = 0; j < cPointsAll[i].Count; j++)
@@ -2186,7 +2198,7 @@ namespace BezierTool
                     file.WriteLine();
 
 
-                    if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares)
+                    if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.Composite)
                     {
                         for (int j = 0; j < pPointsAll[i].Count; j++)
                         {
@@ -2209,16 +2221,17 @@ namespace BezierTool
 
         private void btnImportAll_Click(object sender, EventArgs e)
         {
-            BezierType listType = BezierType.dPoints;
+            BezierType listType = BezierType.Nothing;
             ParamType paramType = ParamType.Nothing;
-
-            List<PointF> pointList = new List<PointF>();
-            PointF point = new PointF(5,6);
+            MoveType moveType = MoveType.Nothing;
+            cPoints = null;
+            
+            PointF point = new PointF();
             int index;
-
+            
             string path = "";
             string line = "";
-            string xText = "", yText = "", paramText = "";
+            string xText = "", yText = "", subText = "";
 
             try
             {
@@ -2241,9 +2254,6 @@ namespace BezierTool
 
             if (File.Exists(path))
             {
-
-
-                NewCurve(listType);
                 using (StreamReader file = new StreamReader(path))
                 {
                     while ((line = file.ReadLine()) != null)
@@ -2298,76 +2308,115 @@ namespace BezierTool
                             }
                         }
 
-                        else if (line.Contains("imageLocation"))
+                        else if (line.Contains("dPoints"))
                         {
-                            try
-                            {
-                                imageLocation = line.Substring(line.IndexOf(' ') + 1);
-                                pbCanva.ImageLocation = imageLocation;
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
+                            //FIX
                         }
 
-                        else if (line.Contains("<"))
+                        else if (line.Contains("cPoints"))
+                        {
+                            listType = BezierType.cPoints;
+                        }
+                        else if (line.Contains("pPoints"))
+                        {
+                            listType = BezierType.pPoints;
+                            subText = file.ReadLine();
+                            if (subText == "Uniform")
+                            {
+                                paramType = ParamType.Uniform;
+                            }
+                            else if (subText == "Chord")
+                            {
+                                paramType = ParamType.Chord;
+                            }
+                            else if (subText == "Centripetal")
+                            {
+                                paramType = ParamType.Centripetal;
+                            }
+                        }
+                        else if (line.Contains("LeastSquares"))
+                        {
+                            listType = BezierType.LeastSquares;
+                            subText = file.ReadLine();
+                            if (subText == "Uniform")
+                            {
+                                paramType = ParamType.Uniform;
+                            }
+                            else if (subText == "Chord")
+                            {
+                                paramType = ParamType.Chord;
+                            }
+                            else if (subText == "Centripetal")
+                            {
+                                paramType = ParamType.Centripetal;
+                            }
+                        }
+                        else if (line.Contains("Composite"))
+                        {
+                            listType = BezierType.Composite;
+                            subText = file.ReadLine();
+                            if (subText == "Nothing")
+                            {
+                                moveType = MoveType.Nothing;
+                            }
+                            else if (subText == "LeftClick")
+                            {
+                                moveType = MoveType.LeftClick;
+                            }
+                            else if (subText == "RightClick")
+                            {
+                                moveType = MoveType.RightClick;
+                            }
+                            else if (subText == "pPoints")
+                            {
+                                moveType = MoveType.pPoints;
+                            }
+                        }
+                        else if (line.Contains("LineSegment"))
+                        {
+                            listType = BezierType.LineSegment;
+                        }
+
+                        if (line.Contains("<") && !line.Contains("dPoints"))
                         {
                             if (cPoints != null)
                             {
-                                //FIX
+                                for (int i = 0; i < cPoints.Count; i++)
+                                {
+                                    PointF tmp = new PointF();
+                                    tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
+                                    tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
+
+                                    cPoints[i] = tmp;
+
+                                }
+
+                                if (pPoints != null)
+                                {
+                                    for (int i = 0; i < pPoints.Count; i++)
+                                    {
+                                        PointF tmp = new PointF();
+                                        tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
+                                        tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+
+                                        pPoints[i] = tmp;
+                                    }
+                                }
+
+                                cPointsAll[cPointsAll.Count - 1] = cPoints;
+                                pPointsAll[pPointsAll.Count - 1] = pPoints;
                             }
-                            cPointsAll[cPointsAll.Count - 1] = cPoints;
-                            pPointsAll[pPointsAll.Count - 1] = pPoints;
-
+                            
                             NewCurve(listType);
-
-
 
                             if (listType == BezierType.pPoints || listType == BezierType.LeastSquares)
                             {
                                 parametrization[parametrization.Count - 1] = paramType;
                             }
 
-
-                            if (line.Contains("cPoints"))
+                            if (listType == BezierType.Composite)
                             {
-                                listType = BezierType.cPoints;
-                            }
-                            else if (line.Contains("pPoints"))
-                            {
-                                listType = BezierType.pPoints;
-                            }
-                            else if (line.Contains("LeastSquares"))
-                            {
-                                listType = BezierType.LeastSquares;
-                            }
-                            else if (line.Contains("Composite"))
-                            {
-                                listType = BezierType.Composite;
-                            }
-                            else if (line.Contains("LineSegment"))
-                            {
-                                listType = BezierType.LineSegment;
-                            }
-
-                            if (listType == BezierType.pPoints || listType == BezierType.LeastSquares)
-                            {
-                                paramText = file.ReadLine();
-                                if (paramText == "Uniform")
-                                {
-                                    paramType = ParamType.Uniform;
-                                }
-                                else if (paramText == "Chord")
-                                {
-                                    paramType = ParamType.Chord;
-                                }
-                                else if (paramText == "Centripetal")
-                                {
-                                    paramType = ParamType.Centripetal;
-                                }
+                                movedCurve[movedCurve.Count - 1] = moveType;
                             }
 
                         }
@@ -2426,63 +2475,41 @@ namespace BezierTool
                             }
                         }
                     }
-                   
 
-                    
+                    if (cPoints != null)
+                    {
+                        for (int i = 0; i < cPoints.Count; i++)
+                        {
+                            PointF tmp = new PointF();
+                            tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
+                            tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
 
-                    cPointsAll[cPointsAll.Count - 1] = cPoints;
-                    pPointsAll[pPointsAll.Count - 1] = pPoints;
-                    //NewCurve(listType);
+                            cPoints[i] = tmp;
+                        }
+
+                        if (pPoints != null)
+                        {
+                            for (int i = 0; i < pPoints.Count; i++)
+                            {
+                                PointF tmp = new PointF();
+                                tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
+                                tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+
+                                pPoints[i] = tmp;
+                            }
+                        }
+
+                        cPointsAll[cPointsAll.Count - 1] = cPoints;
+                        pPointsAll[pPointsAll.Count - 1] = pPoints;
+                    }
                 }
 
-
-
-
-
-
-
-
-                /*
-                    NewCurve(addType);
-                    using (StreamReader file = new StreamReader(path))
-                    {
-                        while ((textLine = file.ReadLine()) != null)
-                        {
-                            int index = textLine.IndexOf(' ');
-                            string xCoordinate = textLine.Substring(0, index);
-                            string yCoordinate = textLine.Substring(index + 1);
-
-                            try
-                            {
-                                point.X = Convert.ToSingle(xCoordinate);
-                                point.Y = Convert.ToSingle(yCoordinate);
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
-
-                            pointList.Add(point);
-                        }
-                    }
-
-                */
+                pbCanva.Invalidate();
             }
 
             else
             {
                 MessageBox.Show("File upload error!");
-            }
-
-            for (int i = 0; i < pointList.Count; i++)
-            {
-                PointF tmp = new PointF();
-                tmp.X = pointList[i].X / scalePropX - shiftVector.X;
-                tmp.Y = pointList[i].Y / scalePropY - shiftVector.Y;
-
-                pointList[i] = tmp;
             }
         }
     }
