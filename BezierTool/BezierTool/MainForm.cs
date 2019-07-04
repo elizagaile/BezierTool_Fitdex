@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using MathNet.Numerics.LinearAlgebra;
 using System.IO;
-using System.Text;
 
 
 namespace BezierTool
@@ -49,22 +48,21 @@ namespace BezierTool
 
 
         private PointF cPointNew; // location of a new control point for <4 cPoints> curve 
-        private PointF preCanvaMove;
 
         public const int maxPointCount = 500; // maximum count of points for <Least Squares> and <Composite> curves; chosen arbitrary
+        public const float pxTOcm = (float)36.6; // for default screens at work
 
         bool isCompositeDone = false; // indicates if the last segment of type <Composite> needs to be finished
         bool canChangeParam = false; // indicates if option to change parametrization is enabled
         bool isChangingParam = false; // indicates if parametrization of a curve is being changed
         bool canDeleteObject = false; // indicates if option to delete a curve is enabled
         bool canChangeColor = false;
-        bool canMoveCanva = false;
 
-        bool isSettingScale = false;
-        List<PointF> scalePoints = new List<PointF>();
-        public static float scalePropX = 1 / (float)36.6; //for default screens at work
-        public static float scalePropY = 1 / (float)36.6;
-        public static PointF shiftVector = new PointF(0,0);
+        public static bool isSettingScale = false;
+        public static List<PointF> scalePoints = new List<PointF>();
+        public static float scalePropX = 1 / pxTOcm; 
+        public static float scalePropY = 1 / pxTOcm;
+        public static PointF shiftVector = new PointF(-10 * pxTOcm, -10 * pxTOcm);
 
         List<Color> curveColor = new List<Color>();
         Color lastColor = Color.Black;
@@ -76,11 +74,21 @@ namespace BezierTool
         List<List<PointF>> pPointsZoom = new List<List<PointF>>();
         List<PointF> dPointsZoom = new List<PointF>();
 
+        int canvaWidth = Convert.ToInt32(125 / scalePropX);
+        int canvaHeight = Convert.ToInt32(75 / scalePropY);
+
         public FormMain()
         {
             InitializeComponent();
-            this.Width = Convert.ToInt32(0.75 * Screen.PrimaryScreen.Bounds.Width);
-            this.Height = Convert.ToInt32(0.75 * Screen.PrimaryScreen.Bounds.Height);
+            this.Width = Screen.PrimaryScreen.Bounds.Width;
+            this.Height = Screen.PrimaryScreen.Bounds.Height;
+
+            lblOrigin.Left = Convert.ToInt32(-shiftVector.X * zoomAmount - 30);
+            lblOrigin.Top = Convert.ToInt32(-shiftVector.X * zoomAmount - 15);
+            Point tmp = new Point(pbCanva.Width - lblxAxis.Width, Convert.ToInt32(-shiftVector.Y * zoomAmount - lblxAxis.Height)); // ???
+            lblxAxis.Location = tmp;
+            tmp = new Point(Convert.ToInt32(-shiftVector.X * zoomAmount) - lblyAxis.Width, pbCanva.Height - lblyAxis.Height);
+            lblyAxis.Location = tmp;
         }
 
 
@@ -337,16 +345,6 @@ namespace BezierTool
                 movedCurve[i] = MoveType.pPoints;
                 pbCanva.Invalidate();
             }
-
-            //???
-            else if (canMoveCanva == true)
-            {
-                Point tmp = new Point();
-                tmp.X = Convert.ToInt32(Math.Min(pbCanva.Location.X + e.X - preCanvaMove.X, 2));
-                tmp.Y = Convert.ToInt32(Math.Min(pbCanva.Location.Y + e.Y - preCanvaMove.Y, 2));
-
-                pbCanva.Location = tmp;
-            }
         }
 
 
@@ -359,95 +357,7 @@ namespace BezierTool
                 localPoint = null;
             }
             modifyCurveType = BezierType.Nothing;
-            canMoveCanva = false;
             pbCanva.Invalidate();
-        }
-
-        /*
-        //???
-        protected override void OnMouseWheel(MouseEventArgs e)
-        {
-            if (e.Delta > 0)
-            {
-                    zoomAmount += 0.05;
-            }
-
-            else if (e.Delta < 0)
-            {
-                zoomAmount -= 0.05;
-            }
-
-            if (zoomAmount > 5 )
-            {
-                zoomAmount = 5;
-            }
-
-            else if (zoomAmount < 0.05)
-            {
-                zoomAmount = 0.05;
-            }
-
-            nudZoom.Value = Convert.ToInt32(zoomAmount * 100);
-        }
-        */
-
-        //???
-        private void MakeZoomLists()
-        {
-            PointF tmp = new PointF();
-            dPointsZoom = new List<PointF>();
-            cPointsZoom = new List<List<PointF>>();
-            pPointsZoom = new List<List<PointF>>();
-
-            if (DefaultForm.dPoints != null)
-            {
-                for (int i = 0; i < DefaultForm.dPoints.Count; i++)
-                {
-                    tmp.X = DefaultForm.dPoints[i].X * zoomAmount;
-                    tmp.Y = DefaultForm.dPoints[i].Y * zoomAmount;
-                    dPointsZoom.Add(tmp);
-                }
-            }
-
-
-            if (cPointsAll != null)
-            {
-                for (int i = 0; i < cPointsAll.Count; i++)
-                {
-                    List<PointF> cList = new List<PointF>();
-                    cPointsZoom.Add(cList);
-                    if (cPointsAll[i] != null)
-                    {
-                        for (int j = 0; j < cPointsAll[i].Count; j++)
-                        {
-                            tmp.X = cPointsAll[i][j].X * zoomAmount;
-                            tmp.Y = cPointsAll[i][j].Y * zoomAmount;
-                            cPointsZoom[i].Add(tmp);
-                        }
-                    }
-                }
-            }
-
-
-            if (pPointsAll != null)
-            {
-                for (int i = 0; i < pPointsAll.Count; i++)
-                {
-                    List<PointF> pList = new List<PointF>();
-                    pPointsZoom.Add(pList);
-                    if (pPointsAll[i] != null)
-                    {
-                        for (int j = 0; j < pPointsAll[i].Count; j++)
-                        {
-                            tmp.X = pPointsAll[i][j].X * zoomAmount;
-                            tmp.Y = pPointsAll[i][j].Y * zoomAmount;
-                            pPointsZoom[i].Add(tmp);
-                        }
-                    }
-                }
-            }
-
-            return;
         }
 
 
@@ -455,20 +365,24 @@ namespace BezierTool
         // as well as calling for functions to get needed control points.
         private void pbCanva_Paint(object sender, PaintEventArgs e)
         {
-            if (allCurves!=null )
-            {
-                if (allCurves.Count > 0)
-                {
-                        lblError.Text = "" + allCurves[0];
-                }
-
-
-            }
-
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // makes lines look smoother
             
             const int dashLength = 5; // describes length of dashes; chosen arbitrary
             int pointRadius = Math.Max(Convert.ToInt32(DefaultForm.pointSize * zoomAmount), 1); // radius of control points and knot points
+            
+            Rectangle rect = new Rectangle(0, 0, Convert.ToInt32(200 * pxTOcm * zoomAmount), Convert.ToInt32(-shiftVector.X * zoomAmount));
+            e.Graphics.FillRectangle(Brushes.WhiteSmoke, rect);
+
+            rect = new Rectangle(0, 0, Convert.ToInt32(-shiftVector.X * zoomAmount), Convert.ToInt32(200 * pxTOcm * zoomAmount));
+            e.Graphics.FillRectangle(Brushes.WhiteSmoke, rect);
+
+            e.Graphics.DrawLine(Pens.LightGray, -20 * pxTOcm * zoomAmount, -shiftVector.X * zoomAmount, 200 * pxTOcm * zoomAmount, -shiftVector.Y * zoomAmount);
+            e.Graphics.DrawLine(Pens.LightGray, -shiftVector.Y * zoomAmount, -20 * pxTOcm * zoomAmount, -shiftVector.Y * zoomAmount, 100 * pxTOcm * zoomAmount);
+
+            e.Graphics.DrawEllipse(Pens.Black, -shiftVector.X * zoomAmount - 1, -shiftVector.Y * zoomAmount - 1, 2, 2);
+            e.Graphics.DrawEllipse(Pens.Black, pbCanva.Width - 4, Convert.ToInt32(-shiftVector.Y * zoomAmount) - 1, 2, 2);
+            e.Graphics.DrawEllipse(Pens.Black, Convert.ToInt32(-shiftVector.X * zoomAmount) - 1, pbCanva.Height - 4, 2, 2);
+
 
             SolidBrush dPointBrush = new SolidBrush(DefaultForm.dPointsColor);
             SolidBrush pPointBrush = new SolidBrush(DefaultForm.pPointsColor);
@@ -657,7 +571,7 @@ namespace BezierTool
             }
         }
 
-
+        
         // Ensures main form is responsive.
         private void FormMain_Resize(object sender, EventArgs e)
         {
@@ -670,8 +584,8 @@ namespace BezierTool
             panel_bottom.Top = formHeight - panel_bottom.Height - 65;
             pnlCanva.Width = formWidth - panel_tools.Width - 35;
             pnlCanva.Height = formHeight - 75;
-            pbCanva.Width = pnlCanva.Width;
-            pbCanva.Height = pnlCanva.Height;
+            pbCanva.Width = canvaWidth;
+            pbCanva.Height = canvaHeight;
             pnlMessage.Top = formHeight - 65;
             pnlMessage.Width = formWidth - 30;
             nudZoom.Left = pnlMessage.Width - 45;
@@ -680,81 +594,41 @@ namespace BezierTool
 
 
         // ???
-        private void ButtonPress()
+        private void nudZoom_ValueChanged(object sender, EventArgs e)
         {
-            lblError.Text = "";
+            zoomAmount = (float)nudZoom.Value / 100;
 
-            canChangeParam = false;
-            isChangingParam = false;
-            canDeleteObject = false;
-            canChangeColor = false;
-            canMoveCanva = false;
-            addType = BezierType.Nothing;
-            modifyPointType = BezierType.Nothing;
-            modifyCurveType = BezierType.Nothing;
-            outputPointType = BezierType.Nothing;
+            pbCanva.Width = Convert.ToInt32(zoomAmount * canvaWidth);
+            pbCanva.Height = Convert.ToInt32(zoomAmount * canvaHeight);
 
-        }
-
-
-        //??
-        private void SetScale()
-        {
-            lblError.ForeColor = Color.Black;
-            lblError.Text = "Message: Choose two points on screen with mouse! (" + (2 - scalePoints.Count) + " points left)";
-
-            if (scalePoints.Count != 2)
-            {
-                return;
-            }
-            
-            if (FormCoordinates.scaleReal == null)
-            {
-                FormCoordinates fc = new FormCoordinates(FormType.Scale, BezierType.Nothing);
-                fc.ShowDialog();
-            }
-
-            if (FormCoordinates.scaleReal == null)
-            {
-                //kkādu pazinojumu?
-                return;
-            }
-
-            PointF scaleVector = new PointF
-            (
-                FormCoordinates.scaleReal.Item2.X - FormCoordinates.scaleReal.Item1.X,
-                FormCoordinates.scaleReal.Item2.Y - FormCoordinates.scaleReal.Item1.Y
-            );
-
-            PointF screenVector = new PointF
-            (
-                scalePoints[1].X - scalePoints[0].X,
-                scalePoints[1].Y - scalePoints[0].Y
-            );
-
-            scalePropX = scaleVector.X / screenVector.X;
-            scalePropY = scaleVector.Y / screenVector.Y;
-
-            shiftVector.X = FormCoordinates.scaleReal.Item1.X / scalePropX - scalePoints[0].X;
-            shiftVector.Y = FormCoordinates.scaleReal.Item1.Y / scalePropY - scalePoints[0].Y;
-            
-            lblError.Text = "" + scalePropX + " " + scalePropY + " " + shiftVector;
-
-            if (DefaultForm.dPoints != null)
-            {
-                for (int i = 0; i < DefaultForm.dPoints.Count; i++)
-                {
-                    PointF tmp = new PointF();
-                    tmp.X = DefaultForm.dPoints[i].X / scalePropX - shiftVector.X;
-                    tmp.Y = DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y;
-
-                    DefaultForm.dPoints[i] = tmp;
-                }
-            }
+            Point tmp = new Point(Convert.ToInt32(-shiftVector.X * zoomAmount - 30), Convert.ToInt32(-shiftVector.Y * zoomAmount - 15)); // ???
+            lblOrigin.Location = tmp;
+            tmp = new Point(pbCanva.Width - 4- lblxAxis.Width, Convert.ToInt32(-shiftVector.Y * zoomAmount - 1-lblxAxis.Height));
+            lblxAxis.Location = tmp;
+            tmp = new Point(Convert.ToInt32(-shiftVector.X * zoomAmount) - 1 - lblyAxis.Width, pbCanva.Height - 4 - lblyAxis.Height);
+            lblyAxis.Location = tmp;
 
             pbCanva.Invalidate();
         }
 
+
+        // ???
+        private void btnDefault_Click(object sender, EventArgs e)
+        {
+            DefaultForm defaultForm = new DefaultForm();
+            defaultForm.ShowDialog();
+
+            if (isSettingScale == true)
+            {
+                ButtonPress();
+                scalePoints = new List<PointF>();
+                FormCoordinates.scaleReal = null;
+                SetScale();
+            }
+
+            pbCanva.Invalidate();
+        }
+        
 
         // Uploads background image for pbCanva.
         private void btnUploadBackground_Click(object sender, EventArgs e)
@@ -797,10 +671,11 @@ namespace BezierTool
             }
         }
 
-
+        // ???
         private void btnNewSegment_Click(object sender, EventArgs e)
         {
             ButtonPress();
+
             addType = BezierType.LineSegment;
 
             if(rbMouseInput.Checked == true)
@@ -830,19 +705,11 @@ namespace BezierTool
 
             if (rbFileInput.Checked == true)
             {
-                cPoints = GetPointsfromFile();
-
-                if (cPoints.Count != 2)
-                {
-                    lblError.ForeColor = Color.Red;
-                    lblError.Text = "Error: .txt file was not correct!";
-                    return;
-                }
-
-                cPointsAll[cPointsAll.Count - 1] = cPoints;
+                btnImportAll_Click(sender, e);
                 pbCanva.Invalidate();
             }
         }
+
 
         // Start a new <4 cPoints> curve.
         private void btnNew4cPoints_Click(object sender, EventArgs e)
@@ -876,16 +743,7 @@ namespace BezierTool
 
             if (rbFileInput.Checked == true)
             {
-                cPoints = GetPointsfromFile();
-
-                if (cPoints.Count != 4)
-                {
-                    lblError.ForeColor = Color.Red;
-                    lblError.Text = "Error: .txt file was not correct!";
-                    return;
-                }
-
-                cPointsAll[cPointsAll.Count - 1] = cPoints;
+                btnImportAll_Click(sender, e);
                 pbCanva.Invalidate();
             }
         }
@@ -923,16 +781,7 @@ namespace BezierTool
 
             if (rbFileInput.Checked == true)
             {
-                pPoints = GetPointsfromFile();
-
-                if (pPoints.Count != 4)
-                {
-                    lblError.ForeColor = Color.Red;
-                    lblError.Text = "Error: .txt file was not correct!";
-                    return;
-                }
-
-                pPointsAll[pPointsAll.Count - 1] = pPoints;
+                btnImportAll_Click(sender, e);
                 pbCanva.Invalidate();
             }
         }
@@ -970,16 +819,7 @@ namespace BezierTool
 
             if (rbFileInput.Checked == true)
             {
-                pPoints = GetPointsfromFile();
-
-                if (pPoints.Count < 4 || pPoints.Count > maxPointCount)
-                {
-                    lblError.ForeColor = Color.Red;
-                    lblError.Text = "Error: .txt file was not correct!";
-                    return;
-                }
-
-                pPointsAll[pPointsAll.Count - 1] = pPoints;
+                btnImportAll_Click(sender, e);
                 pbCanva.Invalidate();
             }
         }
@@ -1019,16 +859,7 @@ namespace BezierTool
 
             if (rbFileInput.Checked == true)
             {
-                pPoints = GetPointsfromFile();
-
-                if (pPoints.Count < 2 || pPoints.Count > maxPointCount)
-                {
-                    lblError.ForeColor = Color.Red;
-                    lblError.Text = "Error: .txt file was not correct!";
-                    return;
-                }
-
-                pPointsAll[pPointsAll.Count - 1] = pPoints;
+                btnImportAll_Click(sender, e);
                 isCompositeDone = true;
                 pbCanva.Invalidate();
             }
@@ -1109,6 +940,34 @@ namespace BezierTool
         {
             rbUniform_CheckedChanged(sender, e);
         }
+        
+
+        //???
+        private void cbShowcPoints_CheckedChanged(object sender, EventArgs e)
+        {
+            pbCanva.Invalidate();
+        }
+        
+
+        // ???
+        private void pnlLastColor_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                lastColor = colorDialog1.Color;
+            }
+
+            pnlLastColor.BackColor = lastColor;
+        }
+
+
+        // Enable option to change color of a curve.
+        private void btnChangeColor_Click(object sender, EventArgs e)
+        {
+            ButtonPress();
+
+            canChangeColor = true;
+        }
 
 
         // Enable option to output control point coordinates.
@@ -1127,16 +986,420 @@ namespace BezierTool
 
             outputPointType = BezierType.pPoints;
         }
+        
 
-
-        // Enable option to change color of a curve.
-        private void btnChangeColor_Click(object sender, EventArgs e)
+        // ???
+        private void btnImportAll_Click(object sender, EventArgs e)
         {
-            ButtonPress();
+            BezierType listType = BezierType.Nothing;
+            ParamType paramType = ParamType.Nothing;
+            MoveType moveType = MoveType.Nothing;
+            cPoints = null;
 
-            canChangeColor = true;
+            PointF point = new PointF();
+            int index;
+
+            string path = "";
+            string line = "";
+            string xText = "", yText = "", subText = "";
+
+            try
+            {
+                OpenFileDialog dialog = new OpenFileDialog
+                {
+                    Title = "Open Text File",
+                    Filter = "TXT files|*.txt"
+                };
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    path = dialog.FileName;
+                }
+            }
+
+            catch (Exception)
+            {
+                MessageBox.Show("File upload error!");
+            }
+
+            if (File.Exists(path))
+            {
+                using (StreamReader file = new StreamReader(path))
+                {
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (line.Contains("scalePropX"))
+                        {
+                            try
+                            {
+                                scalePropX = Convert.ToSingle(line.Substring(line.IndexOf(' ')));
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("scalePropY"))
+                        {
+                            try
+                            {
+                                scalePropY = Convert.ToSingle(line.Substring(line.IndexOf(' ')));
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("shiftVector"))
+                        {
+                            try
+                            {
+                                index = line.IndexOf('X') + 2;
+                                xText = line.Substring(index, line.IndexOf(',') - index);
+                                point.X = Convert.ToSingle(xText);
+
+                                index = line.IndexOf('Y') + 2;
+                                yText = line.Substring(index, line.IndexOf('}') - index);
+                                point.Y = Convert.ToSingle(yText);
+
+                                shiftVector = point;
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("D"))
+                        {
+                            try
+                            {
+                                index = line.IndexOf('(') + 1;
+                                xText = line.Substring(index, line.IndexOf(';') - index);
+                                point.X = Convert.ToSingle(xText) / scalePropX - shiftVector.X;
+
+                                index = line.IndexOf(';') + 2;
+                                yText = line.Substring(index, line.IndexOf(')') - index);
+                                point.Y = Convert.ToSingle(yText) / scalePropY - shiftVector.Y;
+
+                                DefaultForm.dPoints.Add(point);
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("cPoints"))
+                        {
+                            listType = BezierType.cPoints;
+                        }
+                        else if (line.Contains("pPoints"))
+                        {
+                            listType = BezierType.pPoints;
+                            subText = file.ReadLine();
+                            if (subText == "Uniform")
+                            {
+                                paramType = ParamType.Uniform;
+                            }
+                            else if (subText == "Chord")
+                            {
+                                paramType = ParamType.Chord;
+                            }
+                            else if (subText == "Centripetal")
+                            {
+                                paramType = ParamType.Centripetal;
+                            }
+                        }
+                        else if (line.Contains("LeastSquares"))
+                        {
+                            listType = BezierType.LeastSquares;
+                            subText = file.ReadLine();
+                            if (subText == "Uniform")
+                            {
+                                paramType = ParamType.Uniform;
+                            }
+                            else if (subText == "Chord")
+                            {
+                                paramType = ParamType.Chord;
+                            }
+                            else if (subText == "Centripetal")
+                            {
+                                paramType = ParamType.Centripetal;
+                            }
+                        }
+                        else if (line.Contains("Composite"))
+                        {
+                            listType = BezierType.Composite;
+                            subText = file.ReadLine();
+                            if (subText == "Nothing")
+                            {
+                                moveType = MoveType.Nothing;
+                            }
+                            else if (subText == "LeftClick")
+                            {
+                                moveType = MoveType.LeftClick;
+                            }
+                            else if (subText == "RightClick")
+                            {
+                                moveType = MoveType.RightClick;
+                            }
+                            else if (subText == "pPoints")
+                            {
+                                moveType = MoveType.pPoints;
+                            }
+                        }
+                        else if (line.Contains("LineSegment"))
+                        {
+                            listType = BezierType.LineSegment;
+                        }
+
+                        if (line.Contains("<") && !line.Contains("dPoints"))
+                        {
+                            if (cPoints != null)
+                            {
+                                for (int i = 0; i < cPoints.Count; i++)
+                                {
+                                    PointF tmp = new PointF();
+                                    tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
+                                    tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
+
+                                    cPoints[i] = tmp;
+
+                                }
+
+                                if (pPoints != null)
+                                {
+                                    for (int i = 0; i < pPoints.Count; i++)
+                                    {
+                                        PointF tmp = new PointF();
+                                        tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
+                                        tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+
+                                        pPoints[i] = tmp;
+                                    }
+                                }
+
+                                cPointsAll[cPointsAll.Count - 1] = cPoints;
+                                pPointsAll[pPointsAll.Count - 1] = pPoints;
+                            }
+
+                            NewCurve(listType);
+
+                            if (listType == BezierType.pPoints || listType == BezierType.LeastSquares)
+                            {
+                                parametrization[parametrization.Count - 1] = paramType;
+                            }
+
+                            if (listType == BezierType.Composite)
+                            {
+                                movedCurve[movedCurve.Count - 1] = moveType;
+                            }
+
+                        }
+
+                        else if (line.Contains("C"))
+                        {
+                            if (cPoints == null)
+                            {
+                                cPoints = new List<PointF>();
+                            }
+
+                            try
+                            {
+                                index = line.IndexOf('(') + 1;
+                                xText = line.Substring(index, line.IndexOf(';') - index);
+                                point.X = Convert.ToSingle(xText);
+
+                                index = line.IndexOf(';') + 2;
+                                yText = line.Substring(index, line.IndexOf(')') - index);
+                                point.Y = Convert.ToSingle(yText);
+
+                                cPoints.Add(point);
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+
+                        else if (line.Contains("P"))
+                        {
+                            if (pPoints == null)
+                            {
+                                pPoints = new List<PointF>();
+                            }
+
+                            try
+                            {
+                                index = line.IndexOf('(') + 1;
+                                xText = line.Substring(index, line.IndexOf(';') - index);
+                                point.X = Convert.ToSingle(xText);
+
+                                index = line.IndexOf(';') + 2;
+                                yText = line.Substring(index, line.IndexOf(')') - index);
+                                point.Y = Convert.ToSingle(yText);
+
+                                pPoints.Add(point);
+                            }
+
+                            catch (Exception)
+                            {
+                                lblError.ForeColor = Color.Red;
+                                lblError.Text = "Error: .txt file was not correct!";
+                            }
+                        }
+                    }
+
+                    if (cPoints != null)
+                    {
+                        for (int i = 0; i < cPoints.Count; i++)
+                        {
+                            PointF tmp = new PointF();
+                            tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
+                            tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
+
+                            cPoints[i] = tmp;
+                        }
+
+                        if (pPoints != null)
+                        {
+                            for (int i = 0; i < pPoints.Count; i++)
+                            {
+                                PointF tmp = new PointF();
+                                tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
+                                tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+
+                                pPoints[i] = tmp;
+                            }
+                        }
+
+                        cPointsAll[cPointsAll.Count - 1] = cPoints;
+                        pPointsAll[pPointsAll.Count - 1] = pPoints;
+                    }
+                }
+
+                pbCanva.Invalidate();
+            }
+
+            else
+            {
+                MessageBox.Show("File upload error!");
+            }
         }
 
+
+        // ???
+        private void btnExportAll_Click(object sender, EventArgs e)
+        {
+            string path = "";
+
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "txt files|*.txt";
+            dialog.Title = "Export All Objects";
+            dialog.FileName = "BezierTool";
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                if (dialog.FileName != "")
+                {
+                    FileStream fs = File.Create(dialog.FileName);
+                    path = Path.Combine(Path.GetDirectoryName(dialog.FileName), dialog.FileName);
+                    fs.Close();
+                }
+            }
+
+            else
+            {
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: Output error!";
+                return;
+            }
+
+            using (var file = new StreamWriter(path))
+            {
+                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "\n");
+                file.WriteLine("scalePropX: " + scalePropX);
+                file.WriteLine("scalePropY: " + scalePropY);
+                file.WriteLine("shiftVector: " + shiftVector + "\n \n");
+
+                if (DefaultForm.dPoints != null)
+                {
+                    file.WriteLine("<dPoints>: \n");
+                    for (int i = 0; i < DefaultForm.dPoints.Count; i++)
+                    {
+                        double scaledX = Math.Round((DefaultForm.dPoints[i].X + shiftVector.X) * scalePropX, 4);
+                        double scaledY = Math.Round((DefaultForm.dPoints[i].Y + shiftVector.Y) * scalePropY, 4);
+
+                        string line = "D" + (i + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
+                        file.WriteLine(line);
+                    }
+                }
+
+                file.WriteLine("\n");
+
+                if (allCurves == null)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < allCurves.Count; i++)
+                {
+                    file.WriteLine("<" + allCurves[i] + ">:");
+
+                    if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares)
+                    {
+                        file.WriteLine("" + parametrization[i]);
+                    }
+
+                    if (allCurves[i] == BezierType.Composite)
+                    {
+                        file.WriteLine("" + movedCurve[i]);
+                    }
+
+                    file.WriteLine();
+
+                    for (int j = 0; j < cPointsAll[i].Count; j++)
+                    {
+                        double scaledX = Math.Round((cPointsAll[i][j].X + shiftVector.X) * scalePropX, 4);
+                        double scaledY = Math.Round((cPointsAll[i][j].Y + shiftVector.Y) * scalePropY, 4);
+
+                        string line = "C" + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
+                        file.WriteLine(line);
+                    }
+
+                    file.WriteLine();
+
+
+                    if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.Composite)
+                    {
+                        for (int j = 0; j < pPointsAll[i].Count; j++)
+                        {
+                            double scaledX = Math.Round((pPointsAll[i][j].X + shiftVector.X) * scalePropX, 4);
+                            double scaledY = Math.Round((pPointsAll[i][j].Y + shiftVector.Y) * scalePropY, 4);
+
+                            string line = "P" + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
+                            file.WriteLine(line);
+                        }
+                    }
+
+                    file.WriteLine("\n");
+                }
+                file.Close();
+            }
+        }
+        
 
         // Enable option to delete a curve.
         private void btnDeleteCurve_Click(object sender, EventArgs e)
@@ -1194,6 +1457,140 @@ namespace BezierTool
             FormMain_Resize(sender, e);
 
             pbCanva.Invalidate();
+        }
+
+
+        // ???
+        private void ButtonPress()
+        {
+            lblError.Text = "";
+
+            canChangeParam = false;
+            isChangingParam = false;
+            canDeleteObject = false;
+            canChangeColor = false;
+            addType = BezierType.Nothing;
+            modifyPointType = BezierType.Nothing;
+            modifyCurveType = BezierType.Nothing;
+            outputPointType = BezierType.Nothing;
+
+        }
+        
+
+        //??
+        private void SetScale()
+        {
+            lblError.ForeColor = Color.Black;
+            lblError.Text = "Message: Choose two points on screen with mouse! (" + (2 - scalePoints.Count) + " points left)";
+
+            if (scalePoints.Count != 2)
+            {
+                return;
+            }
+
+            if (FormCoordinates.scaleReal == null)
+            {
+                FormCoordinates fc = new FormCoordinates(FormType.Scale, BezierType.Nothing);
+                fc.ShowDialog();
+            }
+
+            if (FormCoordinates.scaleReal == null)
+            {
+                //kkādu pazinojumu?
+                return;
+            }
+
+            PointF scaleVector = new PointF
+            (
+                FormCoordinates.scaleReal.Item2.X - FormCoordinates.scaleReal.Item1.X,
+                FormCoordinates.scaleReal.Item2.Y - FormCoordinates.scaleReal.Item1.Y
+            );
+
+            PointF screenVector = new PointF
+            (
+                scalePoints[1].X - scalePoints[0].X,
+                scalePoints[1].Y - scalePoints[0].Y
+            );
+
+            scalePropX = scaleVector.X / screenVector.X;
+            scalePropY = scaleVector.Y / screenVector.Y;
+
+            shiftVector.X = FormCoordinates.scaleReal.Item1.X / scalePropX - scalePoints[0].X;
+            shiftVector.Y = FormCoordinates.scaleReal.Item1.Y / scalePropY - scalePoints[0].Y;
+
+            if (DefaultForm.dPoints != null)
+            {
+                for (int i = 0; i < DefaultForm.dPoints.Count; i++)
+                {
+                    PointF tmp = new PointF();
+                    tmp.X = DefaultForm.dPoints[i].X / scalePropX - shiftVector.X;
+                    tmp.Y = DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y;
+
+                    DefaultForm.dPoints[i] = tmp;
+                }
+            }
+
+            pbCanva.Invalidate();
+        }
+
+
+        //???
+        private void MakeZoomLists()
+        {
+            PointF tmp = new PointF();
+            dPointsZoom = new List<PointF>();
+            cPointsZoom = new List<List<PointF>>();
+            pPointsZoom = new List<List<PointF>>();
+
+            if (DefaultForm.dPoints != null)
+            {
+                for (int i = 0; i < DefaultForm.dPoints.Count; i++)
+                {
+                    tmp.X = DefaultForm.dPoints[i].X * zoomAmount;
+                    tmp.Y = DefaultForm.dPoints[i].Y * zoomAmount;
+                    dPointsZoom.Add(tmp);
+                }
+            }
+
+
+            if (cPointsAll != null)
+            {
+                for (int i = 0; i < cPointsAll.Count; i++)
+                {
+                    List<PointF> cList = new List<PointF>();
+                    cPointsZoom.Add(cList);
+                    if (cPointsAll[i] != null)
+                    {
+                        for (int j = 0; j < cPointsAll[i].Count; j++)
+                        {
+                            tmp.X = cPointsAll[i][j].X * zoomAmount;
+                            tmp.Y = cPointsAll[i][j].Y * zoomAmount;
+                            cPointsZoom[i].Add(tmp);
+                        }
+                    }
+                }
+            }
+
+
+            if (pPointsAll != null)
+            {
+                for (int i = 0; i < pPointsAll.Count; i++)
+                {
+                    List<PointF> pList = new List<PointF>();
+                    pPointsZoom.Add(pList);
+                    if (pPointsAll[i] != null)
+                    {
+                        for (int j = 0; j < pPointsAll[i].Count; j++)
+                        {
+                            tmp.X = pPointsAll[i][j].X * zoomAmount;
+                            tmp.Y = pPointsAll[i][j].Y * zoomAmount;
+                            pPointsZoom[i].Add(tmp);
+                        }
+                    }
+                }
+            }
+
+            return;
         }
 
 
@@ -1262,6 +1659,7 @@ namespace BezierTool
 
             return;
         }
+
 
         // Add new control point by mouse to the last curve.
         private void AddcPoint(PointF mouseLocation)
@@ -1503,229 +1901,6 @@ namespace BezierTool
 
             return veryLastHandle;
         }
-        
-
-        // Modify coordinates of a chosen control point.
-        private void ModifycPoint(MouseEventArgs e)
-        {
-            int i = localPoint.Item1;
-            int j = localPoint.Item2;
-
-            modifyCurveType = allCurves[i];
-
-            if (modifyCurveType == BezierType.pPoints || modifyCurveType == BezierType.LeastSquares)
-            {
-                lblError.ForeColor = Color.Red;
-                lblError.Text = "Error: Not allowed to move control points of <" + modifyCurveType + "> curve!";
-                modifyCurveType = BezierType.Nothing;
-                localPoint = null;
-            }
-
-            else if (modifyCurveType == BezierType.Composite)
-            {
-                if (rbKeyboardModify.Checked == true)
-                {
-                    lblError.ForeColor = Color.Red;
-                    lblError.Text = "Error: Not allowed to move control points of <Composite> curve by keyboard!";
-                    localPoint = null;
-                    modifyCurveType = BezierType.Nothing;
-                }
-
-                // every third control point on a <Composite> curve is also a knot point therefore moved as a knot point
-                else if (j % 3 == 0)
-                {
-                    localPoint = null;
-                    modifyCurveType = BezierType.Nothing;
-                }
-
-                else if (e.Button == MouseButtons.Left)
-                {
-                    movedCurve[i] = MoveType.LeftClick;
-                }
-
-                else if (e.Button == MouseButtons.Right)
-                {
-                    movedCurve[i] = MoveType.RightClick;
-                }
-
-                return;
-            }
-
-            else if (rbKeyboardModify.Checked == true)
-            {
-                // when modifying points by keyboard, intialize the form of coordinates
-                FormCoordinates form_KeyboardAdd = new FormCoordinates(FormType.Modify, modifyCurveType);
-                form_KeyboardAdd.ShowDialog();
-
-                movedCurve[i] = MoveType.pPoints;
-                modifyCurveType = BezierType.Nothing;
-                localPoint = null;
-            }
-
-            pbCanva.Invalidate();
-            return;
-        }
-
-
-        // Modify coordinates of a chosen knot point.
-        private void ModifypPoint()
-        {
-            int i = localPoint.Item1;
-            modifyCurveType = allCurves[i];
-
-            if (rbKeyboardModify.Checked == true)
-            {
-                // when modifying points by keyboard, intialize the form of coordinates
-                FormCoordinates form_KeyboardAdd = new FormCoordinates(FormType.Modify, modifyCurveType);
-                form_KeyboardAdd.ShowDialog();
-
-                if (modifyCurveType == BezierType.pPoints || modifyCurveType == BezierType.LeastSquares)
-                {
-                    AddcPointsInterpolation(i);
-                }
-
-                modifyCurveType = BezierType.Nothing;
-                localPoint = null;
-            }
-
-            pbCanva.Invalidate();
-            return;
-        }
-
-
-        // To ensure C2 continuity, when dragging a control point of a <Composite> curve with the left mouse button, 
-        // the opposite handle needs to move as well.
-        private void ModifyHandleComposite(PointF modifyHandle, PointF middlepPoint, PointF oppositeHandle, int opposite)
-        {
-
-            // It doesn't make mathematical sense and makes an error for two control points in <Composite> curve segment to have the same location.
-            if (middlepPoint == modifyHandle)
-            {
-                modifyHandle.X++;
-                modifyHandle.Y++;
-            }
-
-            //We can look at these calculations as vector operations. We want for vector middle-change to keep its length, 
-            //but change its direction so it starts from middle point and is parallel to moving-middle vector.
-            //To do that, we take unit vector from moving-middle (devide moving-middle with its length) and multiply that by 
-            //middle-change length. Finally, we add that to middle point.
-
-            float proportion = GetLength(middlepPoint, oppositeHandle) / GetLength(modifyHandle, middlepPoint);
-
-            oppositeHandle.X = middlepPoint.X + proportion * (middlepPoint.X - modifyHandle.X);
-            oppositeHandle.Y = middlepPoint.Y + proportion * (middlepPoint.Y - modifyHandle.Y);
-
-            cPointsAll[localPoint.Item1][opposite] = oppositeHandle;
-
-            return;
-        }
-
-
-        // To ensure C2 continuity and make sure no other points move when dragging a control point of a <Composite> curve with the right mouse button, 
-        //the control point can only be moved in a straight line away from the middle point. 
-        private void ModifyHandleCompositeStraight(PointF modifyHandle, PointF middlepPoint, PointF oppositeHandle)
-        {
-            const int maxDistanceToMouse = 100; // maximum distance between mouse location and control point being dragged; chosen arbitrary
-
-            int i = localPoint.Item1;
-            int j = localPoint.Item2;
-
-            if (GetLength(modifyHandle, cPointsAll[i][j]) > maxDistanceToMouse)
-            {
-                return;
-            }
-
-            PointF result = new PointF();
-
-            // To move the control point in straight line, we take unit vector from the middlepPoint to 
-            // the place control point was before moving (modifyHandle). It's known that modifyHandle was on the needed curve. 
-            // Than we scale this unit vector by the distance mouse is from the middlepPoint and at last add this vector to the middlepPoint.
-
-            float prop = GetLength(middlepPoint, modifyHandle) / GetLength(oppositeHandle, middlepPoint);
-
-            result.X = middlepPoint.X + prop * (middlepPoint.X - oppositeHandle.X);
-            result.Y = middlepPoint.Y + prop * (middlepPoint.Y - oppositeHandle.Y);
-
-            cPointsAll[i][j] = result;
-
-            return;
-        }
-
-
-        // Modify coordinates of a chosen knot point of <Composite> curve.
-        public static void ModifypPointComposite(PointF mouseLocation)
-        {
-            int i = localPoint.Item1;
-            int j = localPoint.Item2;
-
-            PointF pointOld = new PointF();
-            pointOld = pPointsAll[i][j];
-
-            // every knot point of <Composite> curve is also a control point; change both these point coordinates:
-            pPointsAll[i][j] = mouseLocation;
-            cPointsAll[i][j * 3] = mouseLocation;
-
-            // We can look at these calculations as vector operations. 
-            // We want for the adjacent handles of the knot point to stay in the same position relative to the knot point. 
-            // To do that, we take vectors from knot point to control points and add those vectors to the new knot point coordinates.
-
-            PointF newcPoint = new PointF();
-
-            // first knot point doesn't have the first handle
-            if (j != 0)
-            {
-                newcPoint.X = mouseLocation.X - pointOld.X + cPointsAll[i][j * 3 - 1].X;
-                newcPoint.Y = mouseLocation.Y - pointOld.Y + cPointsAll[i][j * 3 - 1].Y;
-                cPointsAll[i][j * 3 - 1] = newcPoint;
-            }
-
-            //last knot point doesn't have the second handle
-            if (j != pPointsAll[i].Count - 1)
-            {
-                newcPoint.X = mouseLocation.X - pointOld.X + cPointsAll[i][j * 3 + 1].X;
-                newcPoint.Y = mouseLocation.Y - pointOld.Y + cPointsAll[i][j * 3 + 1].Y;
-                cPointsAll[i][j * 3 + 1] = newcPoint;
-            }
-
-            return;
-        }
-
-
-        // Change parametrization method and show the method being used now.
-        private void ChangeParametrization()
-        {
-            lblError.Text = "";
-
-            int i = localPoint.Item1;
-            
-            ParamType paramType = parametrization[i];
-
-            if (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.Composite)
-            {
-                lblError.ForeColor = Color.Red;
-                lblError.Text = "Error: <" + allCurves[i] + "> curves does not use parametrization!";
-                return;
-            }
-
-            // Show the real parametrization type of the selected curve:
-
-            if (paramType == ParamType.Uniform)
-            {
-                rbUniform.Checked = true;
-            }
-
-            else if (paramType == ParamType.Chord)
-            {
-                rbChord.Checked = true;
-            }
-
-            else if (paramType == ParamType.Centripetal)
-            {
-                rbCentripetal.Checked = true;
-            }
-
-            isChangingParam = true;
-        }
 
 
         // Find if there is a control or knot point near mouse location
@@ -1924,7 +2099,7 @@ namespace BezierTool
             }
             return arrayS;
         }
-
+        
 
         // Get length between two points
         private float GetLength(PointF firstPoint, PointF secondPoint)
@@ -1933,82 +2108,230 @@ namespace BezierTool
         }
 
 
-        // Choose a .txt file and output a list of points from it.
-        private List<PointF> GetPointsfromFile()
+        // Modify coordinates of a chosen control point.
+        private void ModifycPoint(MouseEventArgs e)
         {
-            List<PointF> pointList = new List<PointF>();
-            PointF point = new PointF();
+            int i = localPoint.Item1;
+            int j = localPoint.Item2;
 
-            string path = "";
-            string textLine = "";
+            modifyCurveType = allCurves[i];
 
-            try
+            if (modifyCurveType == BezierType.pPoints || modifyCurveType == BezierType.LeastSquares)
             {
-                OpenFileDialog dialog = new OpenFileDialog
-                {
-                    Title = "Open Text File",
-                    Filter = "TXT files|*.txt", // only .txt files are supported
-                    InitialDirectory = @"C:\"
-                };
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: Not allowed to move control points of <" + modifyCurveType + "> curve!";
+                modifyCurveType = BezierType.Nothing;
+                localPoint = null;
+            }
 
-                if (dialog.ShowDialog() == DialogResult.OK)
+            else if (modifyCurveType == BezierType.Composite)
+            {
+                if (rbKeyboardModify.Checked == true)
                 {
-                    path = dialog.FileName;
+                    lblError.ForeColor = Color.Red;
+                    lblError.Text = "Error: Not allowed to move control points of <Composite> curve by keyboard!";
+                    localPoint = null;
+                    modifyCurveType = BezierType.Nothing;
                 }
-            }
 
-            catch (Exception)
-            {
-                MessageBox.Show("File upload error!");
-            }
-
-            if (File.Exists(path))
-            {
-                NewCurve(addType);
-                using (StreamReader file = new StreamReader(path))
+                // every third control point on a <Composite> curve is also a knot point therefore moved as a knot point
+                else if (j % 3 == 0)
                 {
-                    while ((textLine = file.ReadLine()) != null)
-                    {
-                        int index = textLine.IndexOf(' ');
-                        string xCoordinate = textLine.Substring(0, index);
-                        string yCoordinate = textLine.Substring(index + 1);
-
-                        try
-                        {
-                            point.X = Convert.ToSingle(xCoordinate);
-                            point.Y = Convert.ToSingle(yCoordinate);
-                        }
-
-                        catch (Exception)
-                        {
-                            lblError.ForeColor = Color.Red;
-                            lblError.Text = "Error: .txt file was not correct!";
-                            return pointList;
-                        }
-
-                        pointList.Add(point);
-                    }
+                    localPoint = null;
+                    modifyCurveType = BezierType.Nothing;
                 }
+
+                else if (e.Button == MouseButtons.Left)
+                {
+                    movedCurve[i] = MoveType.LeftClick;
+                }
+
+                else if (e.Button == MouseButtons.Right)
+                {
+                    movedCurve[i] = MoveType.RightClick;
+                }
+
+                return;
             }
 
-            else
+            else if (rbKeyboardModify.Checked == true)
             {
-                MessageBox.Show("File upload error!");
+                // when modifying points by keyboard, intialize the form of coordinates
+                FormCoordinates form_KeyboardAdd = new FormCoordinates(FormType.Modify, modifyCurveType);
+                form_KeyboardAdd.ShowDialog();
+
+                movedCurve[i] = MoveType.pPoints;
+                modifyCurveType = BezierType.Nothing;
+                localPoint = null;
             }
 
-            for (int i = 0; i < pointList.Count; i++)
-            {
-                PointF tmp = new PointF();
-                tmp.X = pointList[i].X / scalePropX - shiftVector.X;
-                tmp.Y = pointList[i].Y / scalePropY - shiftVector.Y;
-
-                pointList[i] = tmp;
-            }
-
-            return pointList;
+            pbCanva.Invalidate();
+            return;
         }
 
 
+        // Modify coordinates of a chosen knot point.
+        private void ModifypPoint()
+        {
+            int i = localPoint.Item1;
+            modifyCurveType = allCurves[i];
+
+            if (rbKeyboardModify.Checked == true)
+            {
+                // when modifying points by keyboard, intialize the form of coordinates
+                FormCoordinates form_KeyboardAdd = new FormCoordinates(FormType.Modify, modifyCurveType);
+                form_KeyboardAdd.ShowDialog();
+
+                if (modifyCurveType == BezierType.pPoints || modifyCurveType == BezierType.LeastSquares)
+                {
+                    AddcPointsInterpolation(i);
+                }
+
+                modifyCurveType = BezierType.Nothing;
+                localPoint = null;
+            }
+
+            pbCanva.Invalidate();
+            return;
+        }
+
+
+        // To ensure C2 continuity, when dragging a control point of a <Composite> curve with the left mouse button, 
+        // the opposite handle needs to move as well.
+        private void ModifyHandleComposite(PointF modifyHandle, PointF middlepPoint, PointF oppositeHandle, int opposite)
+        {
+
+            // It doesn't make mathematical sense and makes an error for two control points in <Composite> curve segment to have the same location.
+            if (middlepPoint == modifyHandle)
+            {
+                modifyHandle.X++;
+                modifyHandle.Y++;
+            }
+
+            //We can look at these calculations as vector operations. We want for vector middle-change to keep its length, 
+            //but change its direction so it starts from middle point and is parallel to moving-middle vector.
+            //To do that, we take unit vector from moving-middle (devide moving-middle with its length) and multiply that by 
+            //middle-change length. Finally, we add that to middle point.
+
+            float proportion = GetLength(middlepPoint, oppositeHandle) / GetLength(modifyHandle, middlepPoint);
+
+            oppositeHandle.X = middlepPoint.X + proportion * (middlepPoint.X - modifyHandle.X);
+            oppositeHandle.Y = middlepPoint.Y + proportion * (middlepPoint.Y - modifyHandle.Y);
+
+            cPointsAll[localPoint.Item1][opposite] = oppositeHandle;
+
+            return;
+        }
+
+
+        // To ensure C2 continuity and make sure no other points move when dragging a control point of a <Composite> curve with the right mouse button, 
+        //the control point can only be moved in a straight line away from the middle point. 
+        private void ModifyHandleCompositeStraight(PointF modifyHandle, PointF middlepPoint, PointF oppositeHandle)
+        {
+            const int maxDistanceToMouse = 100; // maximum distance between mouse location and control point being dragged; chosen arbitrary
+
+            int i = localPoint.Item1;
+            int j = localPoint.Item2;
+
+            if (GetLength(modifyHandle, cPointsAll[i][j]) > maxDistanceToMouse)
+            {
+                return;
+            }
+
+            PointF result = new PointF();
+
+            // To move the control point in straight line, we take unit vector from the middlepPoint to 
+            // the place control point was before moving (modifyHandle). It's known that modifyHandle was on the needed curve. 
+            // Than we scale this unit vector by the distance mouse is from the middlepPoint and at last add this vector to the middlepPoint.
+
+            float prop = GetLength(middlepPoint, modifyHandle) / GetLength(oppositeHandle, middlepPoint);
+
+            result.X = middlepPoint.X + prop * (middlepPoint.X - oppositeHandle.X);
+            result.Y = middlepPoint.Y + prop * (middlepPoint.Y - oppositeHandle.Y);
+
+            cPointsAll[i][j] = result;
+
+            return;
+        }
+
+
+        // Modify coordinates of a chosen knot point of <Composite> curve.
+        public static void ModifypPointComposite(PointF mouseLocation)
+        {
+            int i = localPoint.Item1;
+            int j = localPoint.Item2;
+
+            PointF pointOld = new PointF();
+            pointOld = pPointsAll[i][j];
+
+            // every knot point of <Composite> curve is also a control point; change both these point coordinates:
+            pPointsAll[i][j] = mouseLocation;
+            cPointsAll[i][j * 3] = mouseLocation;
+
+            // We can look at these calculations as vector operations. 
+            // We want for the adjacent handles of the knot point to stay in the same position relative to the knot point. 
+            // To do that, we take vectors from knot point to control points and add those vectors to the new knot point coordinates.
+
+            PointF newcPoint = new PointF();
+
+            // first knot point doesn't have the first handle
+            if (j != 0)
+            {
+                newcPoint.X = mouseLocation.X - pointOld.X + cPointsAll[i][j * 3 - 1].X;
+                newcPoint.Y = mouseLocation.Y - pointOld.Y + cPointsAll[i][j * 3 - 1].Y;
+                cPointsAll[i][j * 3 - 1] = newcPoint;
+            }
+
+            //last knot point doesn't have the second handle
+            if (j != pPointsAll[i].Count - 1)
+            {
+                newcPoint.X = mouseLocation.X - pointOld.X + cPointsAll[i][j * 3 + 1].X;
+                newcPoint.Y = mouseLocation.Y - pointOld.Y + cPointsAll[i][j * 3 + 1].Y;
+                cPointsAll[i][j * 3 + 1] = newcPoint;
+            }
+
+            return;
+        }
+
+
+        // Change parametrization method and show the method being used now.
+        private void ChangeParametrization()
+        {
+            lblError.Text = "";
+
+            int i = localPoint.Item1;
+
+            ParamType paramType = parametrization[i];
+
+            if (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.Composite)
+            {
+                lblError.ForeColor = Color.Red;
+                lblError.Text = "Error: <" + allCurves[i] + "> curves does not use parametrization!";
+                return;
+            }
+
+            // Show the real parametrization type of the selected curve:
+
+            if (paramType == ParamType.Uniform)
+            {
+                rbUniform.Checked = true;
+            }
+
+            else if (paramType == ParamType.Chord)
+            {
+                rbChord.Checked = true;
+            }
+
+            else if (paramType == ParamType.Centripetal)
+            {
+                rbCentripetal.Checked = true;
+            }
+
+            isChangingParam = true;
+        }
+        
+
+        // ???
         private void OutputPointsToFile(List<PointF> pointList)
         {
             int i = localPoint.Item1;
@@ -2055,462 +2378,34 @@ namespace BezierTool
         }
 
 
+
+        /*
         // ???
-        private void pnlLastColor_Click(object sender, EventArgs e)
+        protected override void OnMouseWheel(MouseEventArgs e)
         {
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            if (e.Delta > 0)
             {
-                lastColor = colorDialog1.Color;
+                    zoomAmount += 0.05;
             }
 
-            pnlLastColor.BackColor = lastColor;
+            else if (e.Delta < 0)
+            {
+                zoomAmount -= 0.05;
+            }
+
+            if (zoomAmount > 5 )
+            {
+                zoomAmount = 5;
+            }
+
+            else if (zoomAmount < 0.05)
+            {
+                zoomAmount = 0.05;
+            }
+
+            nudZoom.Value = Convert.ToInt32(zoomAmount * 100);
         }
+        */
 
-
-        // ???
-        private void btnDefault_Click(object sender, EventArgs e)
-        {
-            DefaultForm defaultForm = new DefaultForm();
-            defaultForm.ShowDialog();
-
-            pbCanva.Invalidate();
-        }
-
-
-        //???
-        private void cbShowcPoints_CheckedChanged(object sender, EventArgs e)
-        {
-            pbCanva.Invalidate();
-        }
-
-
-        //???
-        private void nudZoom_ValueChanged(object sender, EventArgs e)
-        {
-            zoomAmount = (float)nudZoom.Value / 100;
-            
-            pbCanva.Width = Convert.ToInt32(zoomAmount * (pnlCanva.Width - 5));
-            pbCanva.Height = Convert.ToInt32(zoomAmount * pnlCanva.Height);
-
-
-            if (zoomAmount > 1)
-            {
-                pnlCanva.AutoScroll = true;
-            }
-            
-            else
-            {
-                pnlCanva.AutoScroll = false;
-            }
-
-            pbCanva.Invalidate();
-        }
-
-
-        //???
-        private void btnSetScale_Click(object sender, EventArgs e)
-        {
-            ButtonPress();
-            isSettingScale = true;
-            scalePoints = new List<PointF>();
-            FormCoordinates.scaleReal = null;
-            SetScale();
-            pbCanva.Invalidate();
-        }
-
-        private void btnExportAll_Click(object sender, EventArgs e)
-        {
-
-            string path = "";
-
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "txt files|*.txt";
-            dialog.Title = "Export All Objects";
-            dialog.FileName = "BezierTool";
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                if (dialog.FileName != "")
-                {
-                    FileStream fs = File.Create(dialog.FileName);
-                    path = Path.Combine(Path.GetDirectoryName(dialog.FileName), dialog.FileName);
-                    fs.Close();
-                }
-            }
-
-            else
-            {
-                lblError.ForeColor = Color.Red;
-                lblError.Text = "Error: Output error!";
-            }
-
-            using (var file = new StreamWriter(path))
-            {
-                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "\n");
-                file.WriteLine("scalePropX: " + scalePropX);
-                file.WriteLine("scalePropY: " + scalePropY);
-                file.WriteLine("shiftVector: " + shiftVector + "\n \n");
-
-                if (DefaultForm.dPoints != null)
-                {
-                    file.WriteLine("<dPoints>: \n");
-                    for (int i = 0; i < DefaultForm.dPoints.Count; i++)
-                    {
-                        double scaledX = Math.Round((DefaultForm.dPoints[i].X + shiftVector.X) * scalePropX, 4);
-                        double scaledY = Math.Round((DefaultForm.dPoints[i].Y + shiftVector.Y) * scalePropY, 4);
-
-                        string line = "D" + (i + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
-                        file.WriteLine(line);
-                    }
-                }
-
-                file.WriteLine("\n");
-
-                if (allCurves == null)
-                {
-                    return;
-                }
-
-                for (int i = 0; i < allCurves.Count; i++)
-                {
-                    file.WriteLine("<" + allCurves[i] + ">:");
-
-                    if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares)
-                    {
-                        file.WriteLine("" + parametrization[i]);
-                    }
-
-                    if (allCurves[i] == BezierType.Composite)
-                    {
-                        file.WriteLine("" + movedCurve[i]);
-                    }
-
-                    file.WriteLine();
-
-                    for (int j = 0; j < cPointsAll[i].Count; j++)
-                    {
-                        double scaledX = Math.Round((cPointsAll[i][j].X + shiftVector.X) * scalePropX, 4);
-                        double scaledY = Math.Round((cPointsAll[i][j].Y + shiftVector.Y) * scalePropY, 4);
-
-                        string line = "C" + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
-                        file.WriteLine(line);
-                    }
-
-                    file.WriteLine();
-
-
-                    if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.Composite)
-                    {
-                        for (int j = 0; j < pPointsAll[i].Count; j++)
-                        {
-                            float scaledX = (pPointsAll[i][j].X + shiftVector.X) * scalePropX;
-                            float scaledY = (pPointsAll[i][j].Y + shiftVector.Y) * scalePropY;
-
-                            string line = "P" + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
-                            file.WriteLine(line);
-                        }
-                    }
-
-                    file.WriteLine("\n");
-                }
-                
-                file.Close();
-
-            }
-
-        }
-
-        private void btnImportAll_Click(object sender, EventArgs e)
-        {
-            BezierType listType = BezierType.Nothing;
-            ParamType paramType = ParamType.Nothing;
-            MoveType moveType = MoveType.Nothing;
-            cPoints = null;
-            
-            PointF point = new PointF();
-            int index;
-            
-            string path = "";
-            string line = "";
-            string xText = "", yText = "", subText = "";
-
-            try
-            {
-                OpenFileDialog dialog = new OpenFileDialog
-                {
-                    Title = "Open Text File",
-                    Filter = "TXT files|*.txt"
-                };
-
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    path = dialog.FileName;
-                }
-            }
-
-            catch (Exception)
-            {
-                MessageBox.Show("File upload error!");
-            }
-
-            if (File.Exists(path))
-            {
-                using (StreamReader file = new StreamReader(path))
-                {
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        if (line.Contains("scalePropX"))
-                        {
-                            try
-                            {
-                                scalePropX = Convert.ToSingle(line.Substring(line.IndexOf(' ')));
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
-                        }
-
-                        else if (line.Contains("scalePropY"))
-                        {
-                            try
-                            {
-                                scalePropY = Convert.ToSingle(line.Substring(line.IndexOf(' ')));
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
-                        }
-
-                        else if (line.Contains("shiftVector"))
-                        {
-                            try
-                            {
-                                index = line.IndexOf('X') + 2;
-                                xText = line.Substring(index, line.IndexOf(',') - index);
-                                point.X = Convert.ToSingle(xText);
-
-                                index = line.IndexOf('Y') + 2;
-                                yText = line.Substring(index, line.IndexOf('}') - index);
-                                point.Y = Convert.ToSingle(yText);
-
-                                shiftVector = point;
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
-                        }
-
-                        else if (line.Contains("dPoints"))
-                        {
-                            //FIX
-                        }
-
-                        else if (line.Contains("cPoints"))
-                        {
-                            listType = BezierType.cPoints;
-                        }
-                        else if (line.Contains("pPoints"))
-                        {
-                            listType = BezierType.pPoints;
-                            subText = file.ReadLine();
-                            if (subText == "Uniform")
-                            {
-                                paramType = ParamType.Uniform;
-                            }
-                            else if (subText == "Chord")
-                            {
-                                paramType = ParamType.Chord;
-                            }
-                            else if (subText == "Centripetal")
-                            {
-                                paramType = ParamType.Centripetal;
-                            }
-                        }
-                        else if (line.Contains("LeastSquares"))
-                        {
-                            listType = BezierType.LeastSquares;
-                            subText = file.ReadLine();
-                            if (subText == "Uniform")
-                            {
-                                paramType = ParamType.Uniform;
-                            }
-                            else if (subText == "Chord")
-                            {
-                                paramType = ParamType.Chord;
-                            }
-                            else if (subText == "Centripetal")
-                            {
-                                paramType = ParamType.Centripetal;
-                            }
-                        }
-                        else if (line.Contains("Composite"))
-                        {
-                            listType = BezierType.Composite;
-                            subText = file.ReadLine();
-                            if (subText == "Nothing")
-                            {
-                                moveType = MoveType.Nothing;
-                            }
-                            else if (subText == "LeftClick")
-                            {
-                                moveType = MoveType.LeftClick;
-                            }
-                            else if (subText == "RightClick")
-                            {
-                                moveType = MoveType.RightClick;
-                            }
-                            else if (subText == "pPoints")
-                            {
-                                moveType = MoveType.pPoints;
-                            }
-                        }
-                        else if (line.Contains("LineSegment"))
-                        {
-                            listType = BezierType.LineSegment;
-                        }
-
-                        if (line.Contains("<") && !line.Contains("dPoints"))
-                        {
-                            if (cPoints != null)
-                            {
-                                for (int i = 0; i < cPoints.Count; i++)
-                                {
-                                    PointF tmp = new PointF();
-                                    tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
-                                    tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
-
-                                    cPoints[i] = tmp;
-
-                                }
-
-                                if (pPoints != null)
-                                {
-                                    for (int i = 0; i < pPoints.Count; i++)
-                                    {
-                                        PointF tmp = new PointF();
-                                        tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
-                                        tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
-
-                                        pPoints[i] = tmp;
-                                    }
-                                }
-
-                                cPointsAll[cPointsAll.Count - 1] = cPoints;
-                                pPointsAll[pPointsAll.Count - 1] = pPoints;
-                            }
-                            
-                            NewCurve(listType);
-
-                            if (listType == BezierType.pPoints || listType == BezierType.LeastSquares)
-                            {
-                                parametrization[parametrization.Count - 1] = paramType;
-                            }
-
-                            if (listType == BezierType.Composite)
-                            {
-                                movedCurve[movedCurve.Count - 1] = moveType;
-                            }
-
-                        }
-
-                        else if (line.Contains("C"))
-                        {
-                            if (cPoints == null)
-                            {
-                                cPoints = new List<PointF>();
-                            }
-
-                            try
-                            {
-                                index = line.IndexOf('(') + 1;
-                                xText = line.Substring(index, line.IndexOf(';') - index);
-                                point.X = Convert.ToSingle(xText);
-
-                                index = line.IndexOf(';') + 2;
-                                yText = line.Substring(index, line.IndexOf(')') - index);
-                                point.Y = Convert.ToSingle(yText);
-
-                                cPoints.Add(point);
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
-                        }
-
-                        else if (line.Contains("P"))
-                        {
-                            if (pPoints == null)
-                            {
-                                pPoints = new List<PointF>();
-                            }
-
-                            try
-                            {
-                                index = line.IndexOf('(') + 1;
-                                xText = line.Substring(index, line.IndexOf(';') - index);
-                                point.X = Convert.ToSingle(xText);
-
-                                index = line.IndexOf(';') + 2;
-                                yText = line.Substring(index, line.IndexOf(')') - index);
-                                point.Y = Convert.ToSingle(yText);
-
-                                pPoints.Add(point);
-                            }
-
-                            catch (Exception)
-                            {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
-                            }
-                        }
-                    }
-
-                    if (cPoints != null)
-                    {
-                        for (int i = 0; i < cPoints.Count; i++)
-                        {
-                            PointF tmp = new PointF();
-                            tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
-                            tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
-
-                            cPoints[i] = tmp;
-                        }
-
-                        if (pPoints != null)
-                        {
-                            for (int i = 0; i < pPoints.Count; i++)
-                            {
-                                PointF tmp = new PointF();
-                                tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
-                                tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
-
-                                pPoints[i] = tmp;
-                            }
-                        }
-
-                        cPointsAll[cPointsAll.Count - 1] = cPoints;
-                        pPointsAll[pPointsAll.Count - 1] = pPoints;
-                    }
-                }
-
-                pbCanva.Invalidate();
-            }
-
-            else
-            {
-                MessageBox.Show("File upload error!");
-            }
-        }
     }
 }

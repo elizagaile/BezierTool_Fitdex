@@ -169,5 +169,10 @@ namespace BezierTool
             polygonSize = 1;
         }
 
+        private void btnSetScale_Click(object sender, EventArgs e)
+        {
+            FormMain.isSettingScale = true;
+            this.Close();
+        }
     }
 }

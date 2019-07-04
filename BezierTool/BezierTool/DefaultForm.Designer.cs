@@ -41,6 +41,7 @@
             this.txtPolygonSize = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtPointSize = new System.Windows.Forms.TextBox();
+            this.btnSetScale = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btndPointsAdd
@@ -106,7 +107,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 275);
+            this.label1.Location = new System.Drawing.Point(12, 301);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(259, 20);
             this.label1.TabIndex = 6;
@@ -115,7 +116,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 301);
+            this.label2.Location = new System.Drawing.Point(11, 333);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(260, 20);
             this.label2.TabIndex = 7;
@@ -123,7 +124,7 @@
             // 
             // txtCurveSize
             // 
-            this.txtCurveSize.Location = new System.Drawing.Point(213, 269);
+            this.txtCurveSize.Location = new System.Drawing.Point(213, 298);
             this.txtCurveSize.Name = "txtCurveSize";
             this.txtCurveSize.Size = new System.Drawing.Size(34, 26);
             this.txtCurveSize.TabIndex = 8;
@@ -131,7 +132,7 @@
             // 
             // txtPolygonSize
             // 
-            this.txtPolygonSize.Location = new System.Drawing.Point(213, 298);
+            this.txtPolygonSize.Location = new System.Drawing.Point(213, 330);
             this.txtPolygonSize.Name = "txtPolygonSize";
             this.txtPolygonSize.Size = new System.Drawing.Size(34, 26);
             this.txtPolygonSize.TabIndex = 9;
@@ -140,7 +141,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 327);
+            this.label3.Location = new System.Drawing.Point(11, 365);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(258, 20);
             this.label3.TabIndex = 11;
@@ -148,17 +149,28 @@
             // 
             // txtPointSize
             // 
-            this.txtPointSize.Location = new System.Drawing.Point(213, 327);
+            this.txtPointSize.Location = new System.Drawing.Point(213, 362);
             this.txtPointSize.Name = "txtPointSize";
             this.txtPointSize.Size = new System.Drawing.Size(34, 26);
             this.txtPointSize.TabIndex = 12;
             this.txtPointSize.Text = "2";
+            // 
+            // btnSetScale
+            // 
+            this.btnSetScale.Location = new System.Drawing.Point(13, 228);
+            this.btnSetScale.Name = "btnSetScale";
+            this.btnSetScale.Size = new System.Drawing.Size(265, 37);
+            this.btnSetScale.TabIndex = 13;
+            this.btnSetScale.Text = "Set Scale";
+            this.btnSetScale.UseVisualStyleBackColor = true;
+            this.btnSetScale.Click += new System.EventHandler(this.btnSetScale_Click);
             // 
             // DefaultForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(409, 428);
+            this.Controls.Add(this.btnSetScale);
             this.Controls.Add(this.txtPointSize);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtPolygonSize);
@@ -193,5 +205,6 @@
         private System.Windows.Forms.TextBox txtPolygonSize;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtPointSize;
+        private System.Windows.Forms.Button btnSetScale;
     }
 }

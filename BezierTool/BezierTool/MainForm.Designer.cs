@@ -61,12 +61,12 @@
             this.rbFileOutput = new System.Windows.Forms.RadioButton();
             this.rbScreenOutput = new System.Windows.Forms.RadioButton();
             this.panel_bottom = new System.Windows.Forms.Panel();
-            this.btnSetScale = new System.Windows.Forms.Button();
+            this.btnExportAll = new System.Windows.Forms.Button();
+            this.btnImportAll = new System.Windows.Forms.Button();
             this.btnDefault = new System.Windows.Forms.Button();
             this.nudZoom = new System.Windows.Forms.NumericUpDown();
             this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
-            this.btnExportAll = new System.Windows.Forms.Button();
             this.btnNewSegment = new System.Windows.Forms.Button();
             this.btnDeleteObject = new System.Windows.Forms.Button();
             this.pnlLastColor = new System.Windows.Forms.Panel();
@@ -75,7 +75,9 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.lblZoom = new System.Windows.Forms.Label();
             this.pnlMessage = new System.Windows.Forms.Panel();
-            this.btnImportAll = new System.Windows.Forms.Button();
+            this.lblOrigin = new System.Windows.Forms.Label();
+            this.lblxAxis = new System.Windows.Forms.Label();
+            this.lblyAxis = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbCanva)).BeginInit();
             this.groupAddInputType.SuspendLayout();
             this.groupAddType.SuspendLayout();
@@ -94,6 +96,7 @@
             // pbCanva
             // 
             this.pbCanva.BackColor = System.Drawing.SystemColors.Window;
+            this.pbCanva.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pbCanva.Location = new System.Drawing.Point(3, 3);
             this.pbCanva.Name = "pbCanva";
             this.pbCanva.Size = new System.Drawing.Size(1071, 969);
@@ -107,7 +110,7 @@
             // 
             // btnUploadBackground
             // 
-            this.btnUploadBackground.Location = new System.Drawing.Point(9, 627);
+            this.btnUploadBackground.Location = new System.Drawing.Point(9, 619);
             this.btnUploadBackground.Name = "btnUploadBackground";
             this.btnUploadBackground.Size = new System.Drawing.Size(314, 37);
             this.btnUploadBackground.TabIndex = 1;
@@ -117,12 +120,16 @@
             // 
             // btnResetAll
             // 
-            this.btnResetAll.Location = new System.Drawing.Point(0, 46);
+            this.btnResetAll.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.btnResetAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResetAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResetAll.ForeColor = System.Drawing.SystemColors.Control;
+            this.btnResetAll.Location = new System.Drawing.Point(168, 95);
             this.btnResetAll.Name = "btnResetAll";
-            this.btnResetAll.Size = new System.Drawing.Size(322, 37);
+            this.btnResetAll.Size = new System.Drawing.Size(155, 37);
             this.btnResetAll.TabIndex = 2;
             this.btnResetAll.Text = "Reset All";
-            this.btnResetAll.UseVisualStyleBackColor = true;
+            this.btnResetAll.UseVisualStyleBackColor = false;
             this.btnResetAll.Click += new System.EventHandler(this.btnResetAll_Click);
             // 
             // btnNew4cPoints
@@ -210,7 +217,7 @@
             // cbShowBackground
             // 
             this.cbShowBackground.AutoSize = true;
-            this.cbShowBackground.Location = new System.Drawing.Point(9, 670);
+            this.cbShowBackground.Location = new System.Drawing.Point(9, 662);
             this.cbShowBackground.Name = "cbShowBackground";
             this.cbShowBackground.Size = new System.Drawing.Size(165, 24);
             this.cbShowBackground.TabIndex = 13;
@@ -281,7 +288,7 @@
             this.groupAddType.Controls.Add(this.btnNewComposite);
             this.groupAddType.Location = new System.Drawing.Point(3, 46);
             this.groupAddType.Name = "groupAddType";
-            this.groupAddType.Size = new System.Drawing.Size(171, 252);
+            this.groupAddType.Size = new System.Drawing.Size(171, 241);
             this.groupAddType.TabIndex = 20;
             this.groupAddType.TabStop = false;
             this.groupAddType.Text = "New Bezier of type:";
@@ -300,7 +307,7 @@
             // 
             this.groupModifyType.Controls.Add(this.btnModifycPoints);
             this.groupModifyType.Controls.Add(this.btnModifypPoints);
-            this.groupModifyType.Location = new System.Drawing.Point(3, 301);
+            this.groupModifyType.Location = new System.Drawing.Point(3, 293);
             this.groupModifyType.Name = "groupModifyType";
             this.groupModifyType.Size = new System.Drawing.Size(171, 114);
             this.groupModifyType.TabIndex = 21;
@@ -311,7 +318,7 @@
             // 
             this.groupModifyInput.Controls.Add(this.rbMouseModify);
             this.groupModifyInput.Controls.Add(this.rbKeyboardModify);
-            this.groupModifyInput.Location = new System.Drawing.Point(180, 301);
+            this.groupModifyInput.Location = new System.Drawing.Point(180, 293);
             this.groupModifyInput.Name = "groupModifyInput";
             this.groupModifyInput.Size = new System.Drawing.Size(146, 114);
             this.groupModifyInput.TabIndex = 22;
@@ -326,7 +333,7 @@
             this.groupParamType.Controls.Add(this.rbUniform);
             this.groupParamType.Location = new System.Drawing.Point(180, 124);
             this.groupParamType.Name = "groupParamType";
-            this.groupParamType.Size = new System.Drawing.Size(146, 174);
+            this.groupParamType.Size = new System.Drawing.Size(146, 163);
             this.groupParamType.TabIndex = 24;
             this.groupParamType.TabStop = false;
             this.groupParamType.Text = "Paramterization:";
@@ -344,7 +351,7 @@
             // 
             // btnChangeParam
             // 
-            this.btnChangeParam.Location = new System.Drawing.Point(6, 115);
+            this.btnChangeParam.Location = new System.Drawing.Point(6, 119);
             this.btnChangeParam.Name = "btnChangeParam";
             this.btnChangeParam.Size = new System.Drawing.Size(134, 37);
             this.btnChangeParam.TabIndex = 2;
@@ -390,7 +397,7 @@
             // 
             this.groupGetCoordinates.Controls.Add(this.btnOutputpPoints);
             this.groupGetCoordinates.Controls.Add(this.btnOutputcPoints);
-            this.groupGetCoordinates.Location = new System.Drawing.Point(3, 421);
+            this.groupGetCoordinates.Location = new System.Drawing.Point(3, 413);
             this.groupGetCoordinates.Name = "groupGetCoordinates";
             this.groupGetCoordinates.Size = new System.Drawing.Size(171, 114);
             this.groupGetCoordinates.TabIndex = 26;
@@ -411,7 +418,7 @@
             // 
             this.groupOutput.Controls.Add(this.rbFileOutput);
             this.groupOutput.Controls.Add(this.rbScreenOutput);
-            this.groupOutput.Location = new System.Drawing.Point(180, 421);
+            this.groupOutput.Location = new System.Drawing.Point(180, 413);
             this.groupOutput.Name = "groupOutput";
             this.groupOutput.Size = new System.Drawing.Size(146, 114);
             this.groupOutput.TabIndex = 27;
@@ -442,31 +449,42 @@
             // 
             // panel_bottom
             // 
-            this.panel_bottom.Controls.Add(this.btnSetScale);
+            this.panel_bottom.Controls.Add(this.btnExportAll);
+            this.panel_bottom.Controls.Add(this.btnImportAll);
             this.panel_bottom.Controls.Add(this.btnDefault);
             this.panel_bottom.Controls.Add(this.btnResetAll);
-            this.panel_bottom.Location = new System.Drawing.Point(1118, 927);
+            this.panel_bottom.Location = new System.Drawing.Point(1118, 870);
             this.panel_bottom.Name = "panel_bottom";
-            this.panel_bottom.Size = new System.Drawing.Size(327, 83);
+            this.panel_bottom.Size = new System.Drawing.Size(327, 140);
             this.panel_bottom.TabIndex = 31;
             // 
-            // btnSetScale
+            // btnExportAll
             // 
-            this.btnSetScale.Location = new System.Drawing.Point(0, 3);
-            this.btnSetScale.Name = "btnSetScale";
-            this.btnSetScale.Size = new System.Drawing.Size(159, 37);
-            this.btnSetScale.TabIndex = 41;
-            this.btnSetScale.Text = "Set Scale";
-            this.btnSetScale.UseVisualStyleBackColor = true;
-            this.btnSetScale.Click += new System.EventHandler(this.btnSetScale_Click);
+            this.btnExportAll.Location = new System.Drawing.Point(9, 95);
+            this.btnExportAll.Name = "btnExportAll";
+            this.btnExportAll.Size = new System.Drawing.Size(155, 37);
+            this.btnExportAll.TabIndex = 41;
+            this.btnExportAll.Text = "Export All";
+            this.btnExportAll.UseVisualStyleBackColor = true;
+            this.btnExportAll.Click += new System.EventHandler(this.btnExportAll_Click);
+            // 
+            // btnImportAll
+            // 
+            this.btnImportAll.Location = new System.Drawing.Point(9, 52);
+            this.btnImportAll.Name = "btnImportAll";
+            this.btnImportAll.Size = new System.Drawing.Size(155, 37);
+            this.btnImportAll.TabIndex = 42;
+            this.btnImportAll.Text = "Import All";
+            this.btnImportAll.UseVisualStyleBackColor = true;
+            this.btnImportAll.Click += new System.EventHandler(this.btnImportAll_Click);
             // 
             // btnDefault
             // 
-            this.btnDefault.Location = new System.Drawing.Point(165, 3);
+            this.btnDefault.Location = new System.Drawing.Point(168, 52);
             this.btnDefault.Name = "btnDefault";
-            this.btnDefault.Size = new System.Drawing.Size(158, 37);
+            this.btnDefault.Size = new System.Drawing.Size(155, 37);
             this.btnDefault.TabIndex = 35;
-            this.btnDefault.Text = "Form Default";
+            this.btnDefault.Text = "Default Settings";
             this.btnDefault.UseVisualStyleBackColor = true;
             this.btnDefault.Click += new System.EventHandler(this.btnDefault_Click);
             // 
@@ -503,7 +521,7 @@
             this.cbShowcPoints.AutoSize = true;
             this.cbShowcPoints.Checked = true;
             this.cbShowcPoints.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbShowcPoints.Location = new System.Drawing.Point(180, 670);
+            this.cbShowcPoints.Location = new System.Drawing.Point(192, 662);
             this.cbShowcPoints.Name = "cbShowcPoints";
             this.cbShowcPoints.Size = new System.Drawing.Size(131, 24);
             this.cbShowcPoints.TabIndex = 36;
@@ -513,15 +531,13 @@
             // 
             // panel_tools
             // 
-            this.panel_tools.Controls.Add(this.btnImportAll);
-            this.panel_tools.Controls.Add(this.btnExportAll);
-            this.panel_tools.Controls.Add(this.btnNewSegment);
             this.panel_tools.Controls.Add(this.cbShowcPoints);
             this.panel_tools.Controls.Add(this.btnUploadBackground);
+            this.panel_tools.Controls.Add(this.cbShowBackground);
+            this.panel_tools.Controls.Add(this.btnNewSegment);
             this.panel_tools.Controls.Add(this.btnDeleteObject);
             this.panel_tools.Controls.Add(this.groupAddType);
             this.panel_tools.Controls.Add(this.pnlLastColor);
-            this.panel_tools.Controls.Add(this.cbShowBackground);
             this.panel_tools.Controls.Add(this.groupAddInputType);
             this.panel_tools.Controls.Add(this.groupParamType);
             this.panel_tools.Controls.Add(this.groupModifyType);
@@ -531,18 +547,8 @@
             this.panel_tools.Controls.Add(this.groupGetCoordinates);
             this.panel_tools.Location = new System.Drawing.Point(1118, 17);
             this.panel_tools.Name = "panel_tools";
-            this.panel_tools.Size = new System.Drawing.Size(330, 816);
+            this.panel_tools.Size = new System.Drawing.Size(330, 699);
             this.panel_tools.TabIndex = 32;
-            // 
-            // btnExportAll
-            // 
-            this.btnExportAll.Location = new System.Drawing.Point(167, 776);
-            this.btnExportAll.Name = "btnExportAll";
-            this.btnExportAll.Size = new System.Drawing.Size(159, 37);
-            this.btnExportAll.TabIndex = 41;
-            this.btnExportAll.Text = "Export All";
-            this.btnExportAll.UseVisualStyleBackColor = true;
-            this.btnExportAll.Click += new System.EventHandler(this.btnExportAll_Click);
             // 
             // btnNewSegment
             // 
@@ -556,7 +562,7 @@
             // 
             // btnDeleteObject
             // 
-            this.btnDeleteObject.Location = new System.Drawing.Point(9, 584);
+            this.btnDeleteObject.Location = new System.Drawing.Point(9, 576);
             this.btnDeleteObject.Name = "btnDeleteObject";
             this.btnDeleteObject.Size = new System.Drawing.Size(314, 37);
             this.btnDeleteObject.TabIndex = 31;
@@ -567,7 +573,7 @@
             // pnlLastColor
             // 
             this.pnlLastColor.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.pnlLastColor.Location = new System.Drawing.Point(174, 541);
+            this.pnlLastColor.Location = new System.Drawing.Point(174, 533);
             this.pnlLastColor.Name = "pnlLastColor";
             this.pnlLastColor.Size = new System.Drawing.Size(146, 37);
             this.pnlLastColor.TabIndex = 37;
@@ -575,7 +581,7 @@
             // 
             // btnChangeColor
             // 
-            this.btnChangeColor.Location = new System.Drawing.Point(9, 541);
+            this.btnChangeColor.Location = new System.Drawing.Point(9, 533);
             this.btnChangeColor.Name = "btnChangeColor";
             this.btnChangeColor.Size = new System.Drawing.Size(159, 37);
             this.btnChangeColor.TabIndex = 36;
@@ -585,7 +591,11 @@
             // 
             // pnlCanva
             // 
+            this.pnlCanva.AutoScroll = true;
             this.pnlCanva.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlCanva.Controls.Add(this.lblyAxis);
+            this.pnlCanva.Controls.Add(this.lblxAxis);
+            this.pnlCanva.Controls.Add(this.lblOrigin);
             this.pnlCanva.Controls.Add(this.pbCanva);
             this.pnlCanva.Location = new System.Drawing.Point(12, 12);
             this.pnlCanva.Name = "pnlCanva";
@@ -613,15 +623,35 @@
             this.pnlMessage.Size = new System.Drawing.Size(1429, 28);
             this.pnlMessage.TabIndex = 40;
             // 
-            // btnImportAll
+            // lblOrigin
             // 
-            this.btnImportAll.Location = new System.Drawing.Point(167, 733);
-            this.btnImportAll.Name = "btnImportAll";
-            this.btnImportAll.Size = new System.Drawing.Size(159, 37);
-            this.btnImportAll.TabIndex = 42;
-            this.btnImportAll.Text = "Import All";
-            this.btnImportAll.UseVisualStyleBackColor = true;
-            this.btnImportAll.Click += new System.EventHandler(this.btnImportAll_Click);
+            this.lblOrigin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblOrigin.AutoSize = true;
+            this.lblOrigin.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblOrigin.Location = new System.Drawing.Point(96, 82);
+            this.lblOrigin.Name = "lblOrigin";
+            this.lblOrigin.Size = new System.Drawing.Size(45, 20);
+            this.lblOrigin.TabIndex = 1;
+            this.lblOrigin.Text = "(0, 0)";
+            // 
+            // lblxAxis
+            // 
+            this.lblxAxis.AutoSize = true;
+            this.lblxAxis.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblxAxis.Location = new System.Drawing.Point(945, 90);
+            this.lblxAxis.Name = "lblxAxis";
+            this.lblxAxis.Size = new System.Drawing.Size(27, 20);
+            this.lblxAxis.TabIndex = 2;
+            this.lblxAxis.Text = "(, )";
+            // 
+            // lblyAxis
+            // 
+            this.lblyAxis.AutoSize = true;
+            this.lblyAxis.Location = new System.Drawing.Point(100, 806);
+            this.lblyAxis.Name = "lblyAxis";
+            this.lblyAxis.Size = new System.Drawing.Size(27, 20);
+            this.lblyAxis.TabIndex = 3;
+            this.lblyAxis.Text = "(, )";
             // 
             // FormMain
             // 
@@ -652,6 +682,7 @@
             this.panel_tools.ResumeLayout(false);
             this.panel_tools.PerformLayout();
             this.pnlCanva.ResumeLayout(false);
+            this.pnlCanva.PerformLayout();
             this.pnlMessage.ResumeLayout(false);
             this.pnlMessage.PerformLayout();
             this.ResumeLayout(false);
@@ -704,10 +735,12 @@
         private System.Windows.Forms.NumericUpDown nudZoom;
         private System.Windows.Forms.Label lblZoom;
         private System.Windows.Forms.Panel pnlMessage;
-        private System.Windows.Forms.Button btnSetScale;
         private System.Windows.Forms.Button btnNewSegment;
         private System.Windows.Forms.Button btnExportAll;
         private System.Windows.Forms.Button btnImportAll;
+        private System.Windows.Forms.Label lblOrigin;
+        private System.Windows.Forms.Label lblyAxis;
+        private System.Windows.Forms.Label lblxAxis;
     }
 }
 
