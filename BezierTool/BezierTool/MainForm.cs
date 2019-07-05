@@ -50,7 +50,10 @@ namespace BezierTool
         private PointF cPointNew; // location of a new control point for <4 cPoints> curve 
 
         public const int maxPointCount = 500; // maximum count of points for <Least Squares> and <Composite> curves; chosen arbitrary
-        public const float pxTOcm = (float)36.6; // for default screens at work
+        public const float cmTOpx = (float)36.65; // for default screens at work
+        int canvaWidthCm = 125; // width of canva in cm
+        int canvaHeightCm = 75; // height of canva in cm
+        private static PointF origin = new Point(10, 10); //origin point of the canva, to set borders (in cm)
 
         bool isCompositeDone = false; // indicates if the last segment of type <Composite> needs to be finished
         bool canChangeParam = false; // indicates if option to change parametrization is enabled
@@ -60,9 +63,9 @@ namespace BezierTool
 
         public static bool isSettingScale = false;
         public static List<PointF> scalePoints = new List<PointF>();
-        public static float scalePropX = 1 / pxTOcm; 
-        public static float scalePropY = 1 / pxTOcm;
-        public static PointF shiftVector = new PointF(-10 * pxTOcm, -10 * pxTOcm);
+        public static float scalePropX = 1 / cmTOpx; 
+        public static float scalePropY = 1 / cmTOpx;
+        public static PointF shiftVector = new PointF(- origin.X * cmTOpx, - origin.Y * cmTOpx);
 
         List<Color> curveColor = new List<Color>();
         Color lastColor = Color.Black;
@@ -74,8 +77,7 @@ namespace BezierTool
         List<List<PointF>> pPointsZoom = new List<List<PointF>>();
         List<PointF> dPointsZoom = new List<PointF>();
 
-        int canvaWidth = Convert.ToInt32(125 / scalePropX);
-        int canvaHeight = Convert.ToInt32(75 / scalePropY);
+
 
         public FormMain()
         {
@@ -83,12 +85,12 @@ namespace BezierTool
             this.Width = Screen.PrimaryScreen.Bounds.Width;
             this.Height = Screen.PrimaryScreen.Bounds.Height;
 
-            lblOrigin.Left = Convert.ToInt32(-shiftVector.X * zoomAmount - 30);
-            lblOrigin.Top = Convert.ToInt32(-shiftVector.X * zoomAmount - 15);
-            Point tmp = new Point(pbCanva.Width - lblxAxis.Width, Convert.ToInt32(-shiftVector.Y * zoomAmount - lblxAxis.Height)); // ???
-            lblxAxis.Location = tmp;
-            tmp = new Point(Convert.ToInt32(-shiftVector.X * zoomAmount) - lblyAxis.Width, pbCanva.Height - lblyAxis.Height);
-            lblyAxis.Location = tmp;
+
+            pbCanva.Width = Convert.ToInt32((canvaWidthCm + origin.X) * cmTOpx);
+            pbCanva.Height = Convert.ToInt32((canvaHeightCm + origin.Y) * cmTOpx);
+
+            lblxAxis.Text = "(" + Convert.ToInt32((pbCanva.Width + shiftVector.X) * scalePropX) + ", 0)";
+            lblyAxis.Text = "(" + Convert.ToInt32((pbCanva.Height + shiftVector.Y) * scalePropY) + ", 0)";
         }
 
 
@@ -365,25 +367,16 @@ namespace BezierTool
         // as well as calling for functions to get needed control points.
         private void pbCanva_Paint(object sender, PaintEventArgs e)
         {
+            if (allCurves != null)
+            {
+                lblError.Text = "" + allCurves.Count;
+            }
+
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // makes lines look smoother
             
             const int dashLength = 5; // describes length of dashes; chosen arbitrary
             int pointRadius = Math.Max(Convert.ToInt32(DefaultForm.pointSize * zoomAmount), 1); // radius of control points and knot points
             
-            Rectangle rect = new Rectangle(0, 0, Convert.ToInt32(200 * pxTOcm * zoomAmount), Convert.ToInt32(-shiftVector.X * zoomAmount));
-            e.Graphics.FillRectangle(Brushes.WhiteSmoke, rect);
-
-            rect = new Rectangle(0, 0, Convert.ToInt32(-shiftVector.X * zoomAmount), Convert.ToInt32(200 * pxTOcm * zoomAmount));
-            e.Graphics.FillRectangle(Brushes.WhiteSmoke, rect);
-
-            e.Graphics.DrawLine(Pens.LightGray, -20 * pxTOcm * zoomAmount, -shiftVector.X * zoomAmount, 200 * pxTOcm * zoomAmount, -shiftVector.Y * zoomAmount);
-            e.Graphics.DrawLine(Pens.LightGray, -shiftVector.Y * zoomAmount, -20 * pxTOcm * zoomAmount, -shiftVector.Y * zoomAmount, 100 * pxTOcm * zoomAmount);
-
-            e.Graphics.DrawEllipse(Pens.Black, -shiftVector.X * zoomAmount - 1, -shiftVector.Y * zoomAmount - 1, 2, 2);
-            e.Graphics.DrawEllipse(Pens.Black, pbCanva.Width - 4, Convert.ToInt32(-shiftVector.Y * zoomAmount) - 1, 2, 2);
-            e.Graphics.DrawEllipse(Pens.Black, Convert.ToInt32(-shiftVector.X * zoomAmount) - 1, pbCanva.Height - 4, 2, 2);
-
-
             SolidBrush dPointBrush = new SolidBrush(DefaultForm.dPointsColor);
             SolidBrush pPointBrush = new SolidBrush(DefaultForm.pPointsColor);
             Pen cPointBrush = new Pen(DefaultForm.cPointsColor)
@@ -403,6 +396,31 @@ namespace BezierTool
             {
                 Width = Math.Max(Convert.ToInt32(DefaultForm.curveSize * zoomAmount), 1)
             };
+
+
+            // Borders and coordinate axes:
+            Rectangle rect = new Rectangle(0, 0, pbCanva.Width, Convert.ToInt32(-shiftVector.Y * zoomAmount));
+            e.Graphics.FillRectangle(Brushes.WhiteSmoke, rect);
+
+            rect = new Rectangle(0, 0, Convert.ToInt32(-shiftVector.X * zoomAmount), pbCanva.Height);
+            e.Graphics.FillRectangle(Brushes.WhiteSmoke, rect);
+
+            e.Graphics.DrawLine(Pens.LightGray, 0, -shiftVector.Y * zoomAmount, pbCanva.Width, -shiftVector.Y * zoomAmount);
+            e.Graphics.DrawLine(Pens.LightGray, 0, -shiftVector.Y * zoomAmount, pbCanva.Width, -shiftVector.Y * zoomAmount);
+            e.Graphics.DrawLine(Pens.LightGray, -shiftVector.X * zoomAmount, 0, -shiftVector.X * zoomAmount, pbCanva.Height);
+
+            e.Graphics.DrawEllipse(Pens.Black, -shiftVector.X * zoomAmount - 1, -shiftVector.Y * zoomAmount - 1, 2, 2);
+            lblOrigin.Left = pbCanva.Left + Convert.ToInt32(-shiftVector.X * zoomAmount) - lblOrigin.Width;
+            lblOrigin.Top = pbCanva.Top + Convert.ToInt32(-shiftVector.X * zoomAmount) - lblOrigin.Height;
+
+            e.Graphics.DrawEllipse(Pens.Black, pbCanva.Width - 4, Convert.ToInt32(-shiftVector.Y * zoomAmount) - 1, 2, 2);
+            lblxAxis.Left = pbCanva.Left + pbCanva.Width - lblxAxis.Width - 3;
+            lblxAxis.Top = pbCanva.Top + Convert.ToInt32(-shiftVector.Y * zoomAmount) - lblxAxis.Height;
+
+            e.Graphics.DrawEllipse(Pens.Black, Convert.ToInt32(-shiftVector.X * zoomAmount) - 1, pbCanva.Height - 4, 2, 2);
+            lblyAxis.Left = pbCanva.Left + Convert.ToInt32(-shiftVector.X * zoomAmount) - lblyAxis.Width;
+            lblyAxis.Top = pbCanva.Top + pbCanva.Height - lblyAxis.Height - 3;
+
 
             MakeZoomLists();
 
@@ -490,7 +508,7 @@ namespace BezierTool
 
                     if (allCurves[i] == BezierType.LineSegment && cPointsAll[i].Count == 2)
                     {
-                        e.Graphics.DrawLine(Pens.Black, cPointsAll[i][0], cPointsAll[i][1]);
+                        e.Graphics.DrawLine(Pens.Black, cPointsZoom[i][0], cPointsZoom[i][1]);
                     }
 
 
@@ -584,12 +602,16 @@ namespace BezierTool
             panel_bottom.Top = formHeight - panel_bottom.Height - 65;
             pnlCanva.Width = formWidth - panel_tools.Width - 35;
             pnlCanva.Height = formHeight - 75;
-            pbCanva.Width = canvaWidth;
-            pbCanva.Height = canvaHeight;
             pnlMessage.Top = formHeight - 65;
             pnlMessage.Width = formWidth - 30;
             nudZoom.Left = pnlMessage.Width - 45;
             lblZoom.Left = pnlMessage.Width - 80;
+            
+            lblxAxis.Left = pbCanva.Width - lblxAxis.Width;
+            lblxAxis.Top = Convert.ToInt32(-shiftVector.Y * zoomAmount) - lblxAxis.Height;
+
+            lblyAxis.Left = Convert.ToInt32(-shiftVector.X * zoomAmount) - lblyAxis.Width;
+            lblyAxis.Top = pbCanva.Height - lblyAxis.Height;
         }
 
 
@@ -598,15 +620,8 @@ namespace BezierTool
         {
             zoomAmount = (float)nudZoom.Value / 100;
 
-            pbCanva.Width = Convert.ToInt32(zoomAmount * canvaWidth);
-            pbCanva.Height = Convert.ToInt32(zoomAmount * canvaHeight);
-
-            Point tmp = new Point(Convert.ToInt32(-shiftVector.X * zoomAmount - 30), Convert.ToInt32(-shiftVector.Y * zoomAmount - 15)); // ???
-            lblOrigin.Location = tmp;
-            tmp = new Point(pbCanva.Width - 4- lblxAxis.Width, Convert.ToInt32(-shiftVector.Y * zoomAmount - 1-lblxAxis.Height));
-            lblxAxis.Location = tmp;
-            tmp = new Point(Convert.ToInt32(-shiftVector.X * zoomAmount) - 1 - lblyAxis.Width, pbCanva.Height - 4 - lblyAxis.Height);
-            lblyAxis.Location = tmp;
+            pbCanva.Width = Convert.ToInt32(zoomAmount * Convert.ToInt32((canvaWidthCm + origin.X) * cmTOpx));
+            pbCanva.Height = Convert.ToInt32(zoomAmount * Convert.ToInt32((canvaHeightCm + origin.Y) * cmTOpx));
 
             pbCanva.Invalidate();
         }
@@ -961,7 +976,7 @@ namespace BezierTool
         }
 
 
-        // Enable option to change color of a curve.
+        // Enable the option to change color of a curve.
         private void btnChangeColor_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -970,7 +985,7 @@ namespace BezierTool
         }
 
 
-        // Enable option to output control point coordinates.
+        // Enable ehe option to output control point coordinates.
         private void btnOutputcPoints_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -1414,6 +1429,7 @@ namespace BezierTool
         private void btnResetAll_Click(object sender, EventArgs e)
         {
             ButtonPress();
+            isSettingScale = false;
 
             string message = "Do you want to reset this form?";
             string title = "Reset all";
@@ -1434,10 +1450,7 @@ namespace BezierTool
 
             cPointsAll = new List<List<PointF>>();
             pPointsAll = new List<List<PointF>>();
-
-            scalePropX = 1 / (float)36.6;
-            scalePropY = 1 / (float)36.6;
-            shiftVector = new PointF(0, 0);
+            
             FormCoordinates.scaleReal = null;
 
             cPoints = null;
@@ -1477,7 +1490,7 @@ namespace BezierTool
         }
         
 
-        //??
+        // ???
         private void SetScale()
         {
             lblError.ForeColor = Color.Black;
@@ -1534,7 +1547,7 @@ namespace BezierTool
         }
 
 
-        //???
+        // ???
         private void MakeZoomLists()
         {
             PointF tmp = new PointF();
@@ -2377,6 +2390,17 @@ namespace BezierTool
             }
         }
 
+
+        // Helps with smooth graphics and buffering
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
+                return cp;
+            }
+        }
 
 
         /*

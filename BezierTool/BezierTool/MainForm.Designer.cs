@@ -72,12 +72,12 @@
             this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnChangeColor = new System.Windows.Forms.Button();
             this.pnlCanva = new System.Windows.Forms.Panel();
+            this.lblyAxis = new System.Windows.Forms.Label();
+            this.lblxAxis = new System.Windows.Forms.Label();
+            this.lblOrigin = new System.Windows.Forms.Label();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.lblZoom = new System.Windows.Forms.Label();
             this.pnlMessage = new System.Windows.Forms.Panel();
-            this.lblOrigin = new System.Windows.Forms.Label();
-            this.lblxAxis = new System.Windows.Forms.Label();
-            this.lblyAxis = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbCanva)).BeginInit();
             this.groupAddInputType.SuspendLayout();
             this.groupAddType.SuspendLayout();
@@ -97,7 +97,7 @@
             // 
             this.pbCanva.BackColor = System.Drawing.SystemColors.Window;
             this.pbCanva.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbCanva.Location = new System.Drawing.Point(3, 3);
+            this.pbCanva.Location = new System.Drawing.Point(-2, -2);
             this.pbCanva.Name = "pbCanva";
             this.pbCanva.Size = new System.Drawing.Size(1071, 969);
             this.pbCanva.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -602,6 +602,37 @@
             this.pnlCanva.Size = new System.Drawing.Size(1097, 998);
             this.pnlCanva.TabIndex = 35;
             // 
+            // lblyAxis
+            // 
+            this.lblyAxis.AutoSize = true;
+            this.lblyAxis.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblyAxis.Location = new System.Drawing.Point(100, 806);
+            this.lblyAxis.Name = "lblyAxis";
+            this.lblyAxis.Size = new System.Drawing.Size(27, 20);
+            this.lblyAxis.TabIndex = 3;
+            this.lblyAxis.Text = "(, )";
+            // 
+            // lblxAxis
+            // 
+            this.lblxAxis.AutoSize = true;
+            this.lblxAxis.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblxAxis.Location = new System.Drawing.Point(945, 90);
+            this.lblxAxis.Name = "lblxAxis";
+            this.lblxAxis.Size = new System.Drawing.Size(27, 20);
+            this.lblxAxis.TabIndex = 2;
+            this.lblxAxis.Text = "(, )";
+            // 
+            // lblOrigin
+            // 
+            this.lblOrigin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblOrigin.AutoSize = true;
+            this.lblOrigin.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.lblOrigin.Location = new System.Drawing.Point(96, 82);
+            this.lblOrigin.Name = "lblOrigin";
+            this.lblOrigin.Size = new System.Drawing.Size(45, 20);
+            this.lblOrigin.TabIndex = 1;
+            this.lblOrigin.Text = "(0, 0)";
+            // 
             // lblZoom
             // 
             this.lblZoom.AutoSize = true;
@@ -622,36 +653,6 @@
             this.pnlMessage.Name = "pnlMessage";
             this.pnlMessage.Size = new System.Drawing.Size(1429, 28);
             this.pnlMessage.TabIndex = 40;
-            // 
-            // lblOrigin
-            // 
-            this.lblOrigin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblOrigin.AutoSize = true;
-            this.lblOrigin.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.lblOrigin.Location = new System.Drawing.Point(96, 82);
-            this.lblOrigin.Name = "lblOrigin";
-            this.lblOrigin.Size = new System.Drawing.Size(45, 20);
-            this.lblOrigin.TabIndex = 1;
-            this.lblOrigin.Text = "(0, 0)";
-            // 
-            // lblxAxis
-            // 
-            this.lblxAxis.AutoSize = true;
-            this.lblxAxis.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.lblxAxis.Location = new System.Drawing.Point(945, 90);
-            this.lblxAxis.Name = "lblxAxis";
-            this.lblxAxis.Size = new System.Drawing.Size(27, 20);
-            this.lblxAxis.TabIndex = 2;
-            this.lblxAxis.Text = "(, )";
-            // 
-            // lblyAxis
-            // 
-            this.lblyAxis.AutoSize = true;
-            this.lblyAxis.Location = new System.Drawing.Point(100, 806);
-            this.lblyAxis.Name = "lblyAxis";
-            this.lblyAxis.Size = new System.Drawing.Size(27, 20);
-            this.lblyAxis.TabIndex = 3;
-            this.lblyAxis.Text = "(, )";
             // 
             // FormMain
             // 
