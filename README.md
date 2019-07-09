@@ -3,8 +3,8 @@
 
 Construct and draw:
 
-<dPoints> - 
-<Line segments> - 
+<dPoints> - import default points from a .txt file.
+<Line segments> - endpoints of line segment are viewed as control points. 
 <4 cPoints> - classic Bezier curve constructed from four control points.
 <4 pPoints> - exact Bezier curve interpolation through four knot points.
 <Least squares> - Bezier curve interpolation through four or more knot points. Usually not exact, but finds the closest fit using least squares.
