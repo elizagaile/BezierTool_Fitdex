@@ -69,7 +69,6 @@
             this.panel_tools = new System.Windows.Forms.Panel();
             this.btnNewSegment = new System.Windows.Forms.Button();
             this.btnDeleteObject = new System.Windows.Forms.Button();
-            this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnChangeColor = new System.Windows.Forms.Button();
             this.pnlCanva = new System.Windows.Forms.Panel();
             this.lblyAxis = new System.Windows.Forms.Label();
@@ -355,7 +354,7 @@
             this.btnChangeParam.Name = "btnChangeParam";
             this.btnChangeParam.Size = new System.Drawing.Size(134, 37);
             this.btnChangeParam.TabIndex = 2;
-            this.btnChangeParam.Text = "Choose Line";
+            this.btnChangeParam.Text = "Choose Curve";
             this.btnChangeParam.UseVisualStyleBackColor = true;
             this.btnChangeParam.Click += new System.EventHandler(this.btnChangeParam_Click);
             // 
@@ -537,7 +536,6 @@
             this.panel_tools.Controls.Add(this.btnNewSegment);
             this.panel_tools.Controls.Add(this.btnDeleteObject);
             this.panel_tools.Controls.Add(this.groupAddType);
-            this.panel_tools.Controls.Add(this.pnlLastColor);
             this.panel_tools.Controls.Add(this.groupAddInputType);
             this.panel_tools.Controls.Add(this.groupParamType);
             this.panel_tools.Controls.Add(this.groupModifyType);
@@ -570,22 +568,13 @@
             this.btnDeleteObject.UseVisualStyleBackColor = true;
             this.btnDeleteObject.Click += new System.EventHandler(this.btnDeleteCurve_Click);
             // 
-            // pnlLastColor
-            // 
-            this.pnlLastColor.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.pnlLastColor.Location = new System.Drawing.Point(174, 533);
-            this.pnlLastColor.Name = "pnlLastColor";
-            this.pnlLastColor.Size = new System.Drawing.Size(146, 37);
-            this.pnlLastColor.TabIndex = 37;
-            this.pnlLastColor.Click += new System.EventHandler(this.pnlLastColor_Click);
-            // 
             // btnChangeColor
             // 
             this.btnChangeColor.Location = new System.Drawing.Point(9, 533);
             this.btnChangeColor.Name = "btnChangeColor";
-            this.btnChangeColor.Size = new System.Drawing.Size(159, 37);
+            this.btnChangeColor.Size = new System.Drawing.Size(314, 37);
             this.btnChangeColor.TabIndex = 36;
-            this.btnChangeColor.Text = "Choose Curve";
+            this.btnChangeColor.Text = "Choose Object to Change Color";
             this.btnChangeColor.UseVisualStyleBackColor = true;
             this.btnChangeColor.Click += new System.EventHandler(this.btnChangeColor_Click);
             // 
@@ -729,7 +718,6 @@
         private System.Windows.Forms.Button btnDeleteObject;
         private System.Windows.Forms.Panel pnlCanva;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.Panel pnlLastColor;
         private System.Windows.Forms.Button btnChangeColor;
         private System.Windows.Forms.Button btnDefault;
         private System.Windows.Forms.CheckBox cbShowcPoints;

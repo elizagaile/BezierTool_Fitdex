@@ -46,13 +46,12 @@ namespace BezierTool
         private List<PointF> cPoints = null; // list of control points of a curve
         private List<PointF> pPoints = null; // list of knot points of a curve
 
-
         private PointF cPointNew; // location of a new control point for <4 cPoints> curve 
 
         public const int maxPointCount = 500; // maximum count of points for <Least Squares> and <Composite> curves; chosen arbitrary
         public const float cmTOpx = (float)36.65; // for default screens at work
-        int canvaWidthCm = 125; // width of canva in cm
-        int canvaHeightCm = 75; // height of canva in cm
+        public static int canvaWidthCm = 125; // width of canva in cm
+        public static int canvaHeightCm = 75; // height of canva in cm
         private static PointF origin = new Point(10, 10); //origin point of the canva, to set borders (in cm)
 
         bool isCompositeDone = false; // indicates if the last segment of type <Composite> needs to be finished
@@ -66,9 +65,9 @@ namespace BezierTool
         public static float scalePropX = 1 / cmTOpx; 
         public static float scalePropY = 1 / cmTOpx;
         public static PointF shiftVector = new PointF(- origin.X * cmTOpx, - origin.Y * cmTOpx);
-
+        
+        public static Color defaultColor = Color.Black;
         List<Color> curveColor = new List<Color>();
-        Color lastColor = Color.Black;
 
         String imageLocation = ""; //path of background image
 
@@ -76,8 +75,7 @@ namespace BezierTool
         List<List<PointF>> cPointsZoom = new List<List<PointF>>();
         List<List<PointF>> pPointsZoom = new List<List<PointF>>();
         List<PointF> dPointsZoom = new List<PointF>();
-
-
+        
 
         public FormMain()
         {
@@ -85,12 +83,8 @@ namespace BezierTool
             this.Width = Screen.PrimaryScreen.Bounds.Width;
             this.Height = Screen.PrimaryScreen.Bounds.Height;
 
-
             pbCanva.Width = Convert.ToInt32((canvaWidthCm + origin.X) * cmTOpx);
             pbCanva.Height = Convert.ToInt32((canvaHeightCm + origin.Y) * cmTOpx);
-
-            lblxAxis.Text = "(" + Convert.ToInt32((pbCanva.Width + shiftVector.X) * scalePropX) + ", 0)";
-            lblyAxis.Text = "(" + Convert.ToInt32((pbCanva.Height + shiftVector.Y) * scalePropY) + ", 0)";
         }
 
 
@@ -99,9 +93,11 @@ namespace BezierTool
         // for dragging points with mouse or for selecting a curve to output its point coordinates
         private void pbCanva_MouseDown(object sender, MouseEventArgs e)
         {
-            PointF eZoom = new PointF();
-            eZoom.X = e.X / zoomAmount;
-            eZoom.Y = e.Y / zoomAmount;
+            PointF eZoom = new PointF
+            {
+                X = e.X / zoomAmount,
+                Y = e.Y / zoomAmount
+            };
 
             // addding a new control point with mouse for <4 cPoints> curve
             if ((addType == BezierType.cPoints || addType == BezierType.LineSegment) && rbMouseInput.Checked == true)
@@ -367,11 +363,6 @@ namespace BezierTool
         // as well as calling for functions to get needed control points.
         private void pbCanva_Paint(object sender, PaintEventArgs e)
         {
-            if (allCurves != null)
-            {
-                lblError.Text = "" + allCurves.Count;
-            }
-
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // makes lines look smoother
             
             const int dashLength = 5; // describes length of dashes; chosen arbitrary
@@ -392,7 +383,7 @@ namespace BezierTool
                 DashPattern = new float[] { dashLength, dashLength },
                 Width = Math.Max(Convert.ToInt32(DefaultForm.polygonSize * zoomAmount), 1)
             };
-            Pen bezierPen = new Pen(lastColor)
+            Pen bezierPen = new Pen(defaultColor)
             {
                 Width = Math.Max(Convert.ToInt32(DefaultForm.curveSize * zoomAmount), 1)
             };
@@ -422,6 +413,16 @@ namespace BezierTool
             lblyAxis.Top = pbCanva.Top + pbCanva.Height - lblyAxis.Height - 3;
 
 
+            lblxAxis.Text = "(" + Convert.ToInt32((pbCanva.Width + shiftVector.X) * scalePropX) + ", 0)";
+            lblyAxis.Text = "(" + Convert.ToInt32((pbCanva.Height + shiftVector.Y) * scalePropY) + ", 0)";
+
+            if (isChangingParam == true)
+            {
+                lblError.ForeColor = Color.Black;
+                lblError.Text = "Curve chosen; select parametrization method!";
+            }
+
+
             MakeZoomLists();
 
             if (DefaultForm.dPoints != null)
@@ -444,9 +445,11 @@ namespace BezierTool
                 // <4 cPoints> curves can't have more than 4 control points
                 if ((cPoints.Count < 4 && addType == BezierType.cPoints) || (cPoints.Count < 2 && addType == BezierType.LineSegment) && rbMouseInput.Checked == true)
                 {
-                    PointF tmp = new PointF();
-                    tmp.X = cPoints[cPoints.Count - 1].X * zoomAmount;
-                    tmp.Y = cPoints[cPoints.Count - 1].Y * zoomAmount;
+                    PointF tmp = new PointF
+                    {
+                        X = cPoints[cPoints.Count - 1].X * zoomAmount,
+                        Y = cPoints[cPoints.Count - 1].Y * zoomAmount
+                    };
                     e.Graphics.DrawLine(dashedPen, tmp, cPointNew);
                 }
             }
@@ -615,7 +618,7 @@ namespace BezierTool
         }
 
 
-        // ???
+        // Change zoom of the canva
         private void nudZoom_ValueChanged(object sender, EventArgs e)
         {
             zoomAmount = (float)nudZoom.Value / 100;
@@ -627,7 +630,7 @@ namespace BezierTool
         }
 
 
-        // ???
+        // Open default settings
         private void btnDefault_Click(object sender, EventArgs e)
         {
             DefaultForm defaultForm = new DefaultForm();
@@ -636,10 +639,14 @@ namespace BezierTool
             if (isSettingScale == true)
             {
                 ButtonPress();
+                isSettingScale = true;
                 scalePoints = new List<PointF>();
                 FormCoordinates.scaleReal = null;
                 SetScale();
             }
+
+            pbCanva.Width = Convert.ToInt32((canvaWidthCm + origin.X) * cmTOpx); //unable to do this through DefaultForm
+            pbCanva.Height = Convert.ToInt32((canvaHeightCm + origin.Y) * cmTOpx);
 
             pbCanva.Invalidate();
         }
@@ -648,7 +655,7 @@ namespace BezierTool
         // Uploads background image for pbCanva.
         private void btnUploadBackground_Click(object sender, EventArgs e)
         {
-            lblError.Text = "";
+            ButtonPress();
 
             try
             {
@@ -686,7 +693,8 @@ namespace BezierTool
             }
         }
 
-        // ???
+
+        // Start new <Line Segment>
         private void btnNewSegment_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -696,6 +704,8 @@ namespace BezierTool
             if(rbMouseInput.Checked == true)
             {
                 cPoints = null;
+                lblError.ForeColor = Color.Black;
+                lblError.Text = "Choose two points by using the mouse!";
             }
 
 
@@ -726,7 +736,7 @@ namespace BezierTool
         }
 
 
-        // Start a new <4 cPoints> curve.
+        // Start new <4 cPoints> curve.
         private void btnNew4cPoints_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -735,6 +745,8 @@ namespace BezierTool
             if (rbMouseInput.Checked == true)
             {
                 cPoints = null;
+                lblError.ForeColor = Color.Black;
+                lblError.Text = "Choose four points by using the mouse!";
             }
 
             if (rbKeyboardInput.Checked == true)
@@ -764,7 +776,7 @@ namespace BezierTool
         }
 
 
-        // Start a new <4 pPoints> curve.
+        // Start new <4 pPoints> curve.
         private void btnNew4pPoints_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -774,6 +786,8 @@ namespace BezierTool
             if (rbMouseInput.Checked == true)
             {
                 pPoints = null;
+                lblError.ForeColor = Color.Black;
+                lblError.Text = "Choose four points by using the mouse; it is possible to select parametrization method!";
             }
 
             if (rbKeyboardInput.Checked == true)
@@ -802,7 +816,7 @@ namespace BezierTool
         }
 
 
-        // Start a new <Least Squares> curve.
+        // Start new <Least Squares> curve.
         private void btnNewLeastSquares_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -812,6 +826,8 @@ namespace BezierTool
             if (rbMouseInput.Checked == true)
             {
                 pPoints = null;
+                lblError.ForeColor = Color.Black;
+                lblError.Text = "Choose 4-" + maxPointCount + " points by using the mouse; it is possible to select parametrization method!";
             }
 
             if (rbKeyboardInput.Checked == true)
@@ -840,7 +856,7 @@ namespace BezierTool
         }
 
 
-        // Start a new <Composite> curve.
+        // Start new <Composite> curve.
         private void btnNewComposite_Click(object sender, EventArgs e)
         {
             ButtonPress();
@@ -850,6 +866,8 @@ namespace BezierTool
             if (rbMouseInput.Checked == true)
             {
                 pPoints = null;
+                lblError.ForeColor = Color.Black;
+                lblError.Text = "Choose 2-" + maxPointCount + " points by using the mouse; press <Done> when finished!";
             }
 
             if (rbKeyboardInput.Checked == true)
@@ -881,11 +899,10 @@ namespace BezierTool
         }
 
 
-        // When a <Composite> curve is indicated as done, draw the last segment of it. 
+        // When <Composite> curve is indicated as done, draw the last segment of it. 
         private void btnDoneComposite_Click(object sender, EventArgs e)
         {
-            lblError.Text = "";
-
+            ButtonPress();
             isCompositeDone = true;
             pbCanva.Invalidate();
         }
@@ -895,6 +912,9 @@ namespace BezierTool
         private void btnModifycPoints_Click(object sender, EventArgs e)
         {
             ButtonPress();
+            lblError.ForeColor = Color.Black;
+            lblError.Text = "Drag control points of <4 cPoints> and <Composite> curves; <Composite>" +
+                " curves have two types of modification depending on the mouse button being used!";
 
             modifyPointType = BezierType.cPoints;
         }
@@ -904,6 +924,8 @@ namespace BezierTool
         private void btnModifypPoints_Click(object sender, EventArgs e)
         {
             ButtonPress();
+            lblError.ForeColor = Color.Black;
+            lblError.Text = "Drag knot points of <4 pPoints>, <Least Squares> and <Composite> curves!";
 
             modifyPointType = BezierType.pPoints;
         }
@@ -913,7 +935,9 @@ namespace BezierTool
         private void btnChangeParam_Click(object sender, EventArgs e)
         {
             ButtonPress();
-
+            lblError.ForeColor = Color.Black;
+            lblError.Text = "Select <4 pPoints> or <Least Squares> curve by pressing on its control point!";
+            
             canChangeParam = true;
         }
 
@@ -955,24 +979,12 @@ namespace BezierTool
         {
             rbUniform_CheckedChanged(sender, e);
         }
-        
 
-        //???
+
+        // Changes the visibility of control points and polygon lines.
         private void cbShowcPoints_CheckedChanged(object sender, EventArgs e)
         {
             pbCanva.Invalidate();
-        }
-        
-
-        // ???
-        private void pnlLastColor_Click(object sender, EventArgs e)
-        {
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
-            {
-                lastColor = colorDialog1.Color;
-            }
-
-            pnlLastColor.BackColor = lastColor;
         }
 
 
@@ -980,6 +992,8 @@ namespace BezierTool
         private void btnChangeColor_Click(object sender, EventArgs e)
         {
             ButtonPress();
+            lblError.ForeColor = Color.Black;
+            lblError.Text = "To change color of an object press its control or knot point!";
 
             canChangeColor = true;
         }
@@ -1003,7 +1017,7 @@ namespace BezierTool
         }
         
 
-        // ???
+        // Choose a .txt file and import settings and curves from it.
         private void btnImportAll_Click(object sender, EventArgs e)
         {
             BezierType listType = BezierType.Nothing;
@@ -1185,9 +1199,11 @@ namespace BezierTool
                             {
                                 for (int i = 0; i < cPoints.Count; i++)
                                 {
-                                    PointF tmp = new PointF();
-                                    tmp.X = cPoints[i].X / scalePropX - shiftVector.X;
-                                    tmp.Y = cPoints[i].Y / scalePropY - shiftVector.Y;
+                                    PointF tmp = new PointF
+                                    {
+                                        X = cPoints[i].X / scalePropX - shiftVector.X,
+                                        Y = cPoints[i].Y / scalePropY - shiftVector.Y
+                                    };
 
                                     cPoints[i] = tmp;
 
@@ -1197,9 +1213,11 @@ namespace BezierTool
                                 {
                                     for (int i = 0; i < pPoints.Count; i++)
                                     {
-                                        PointF tmp = new PointF();
-                                        tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
-                                        tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+                                        PointF tmp = new PointF
+                                        {
+                                            X = pPoints[i].X / scalePropX - shiftVector.X,
+                                            Y = pPoints[i].Y / scalePropY - shiftVector.Y
+                                        };
 
                                         pPoints[i] = tmp;
                                     }
@@ -1272,8 +1290,8 @@ namespace BezierTool
 
                             catch (Exception)
                             {
-                                lblError.ForeColor = Color.Red;
-                                lblError.Text = "Error: .txt file was not correct!";
+                                //lblError.ForeColor = Color.Red;
+                                //lblError.Text = "Error: .txt file was not correct!";
                             }
                         }
                     }
@@ -1316,15 +1334,17 @@ namespace BezierTool
         }
 
 
-        // ???
+        // Make a .txt file and fill it with information about settings and curves.
         private void btnExportAll_Click(object sender, EventArgs e)
         {
             string path = "";
 
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "txt files|*.txt";
-            dialog.Title = "Export All Objects";
-            dialog.FileName = "BezierTool";
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Filter = "txt files|*.txt",
+                Title = "Export All Objects",
+                FileName = "BezierTool"
+            };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 if (dialog.FileName != "")
@@ -1420,6 +1440,8 @@ namespace BezierTool
         private void btnDeleteCurve_Click(object sender, EventArgs e)
         {
             ButtonPress();
+            lblError.ForeColor = Color.Black;
+            lblError.Text = "To delete an object press its control or knot point!";
 
             canDeleteObject = true;
         }
@@ -1429,7 +1451,6 @@ namespace BezierTool
         private void btnResetAll_Click(object sender, EventArgs e)
         {
             ButtonPress();
-            isSettingScale = false;
 
             string message = "Do you want to reset this form?";
             string title = "Reset all";
@@ -1441,13 +1462,12 @@ namespace BezierTool
                 return;
             }
 
-            DefaultForm.ResetAll();
-
             allCurves = new List<BezierType>();
             movedCurve = new List<MoveType>();
             parametrization = new List<ParamType>();
             curveColor = new List<Color>();
 
+            DefaultForm.dPoints = new List<PointF>();
             cPointsAll = new List<List<PointF>>();
             pPointsAll = new List<List<PointF>>();
             
@@ -1458,12 +1478,13 @@ namespace BezierTool
             scalePoints = null;
             localPoint = null;
 
-            rbMouseInput.Checked = true;
-            rbMouseModify.Checked = true;
-            lastColor = Color.Black;
 
             imageLocation = "";
             lblError.Text = "";
+            lblError.ForeColor = Color.Black;
+            rbMouseInput.Checked = true;
+            rbMouseModify.Checked = true;
+            rbUniform.Checked = true;
             cbShowBackground.Checked = false;
             cbShowcPoints.Checked = true;
 
@@ -1473,7 +1494,7 @@ namespace BezierTool
         }
 
 
-        // ???
+        // When pressing any button set multiple values to false to avoid clashing of multiple functionalities.
         private void ButtonPress()
         {
             lblError.Text = "";
@@ -1482,15 +1503,16 @@ namespace BezierTool
             isChangingParam = false;
             canDeleteObject = false;
             canChangeColor = false;
+            isSettingScale = false;
+
             addType = BezierType.Nothing;
             modifyPointType = BezierType.Nothing;
             modifyCurveType = BezierType.Nothing;
             outputPointType = BezierType.Nothing;
-
         }
         
 
-        // ???
+        // Set the scale of the curve with mouse.
         private void SetScale()
         {
             lblError.ForeColor = Color.Black;
@@ -1535,9 +1557,11 @@ namespace BezierTool
             {
                 for (int i = 0; i < DefaultForm.dPoints.Count; i++)
                 {
-                    PointF tmp = new PointF();
-                    tmp.X = DefaultForm.dPoints[i].X / scalePropX - shiftVector.X;
-                    tmp.Y = DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y;
+                    PointF tmp = new PointF
+                    {
+                        X = DefaultForm.dPoints[i].X / scalePropX - shiftVector.X,
+                        Y = DefaultForm.dPoints[i].Y / scalePropY - shiftVector.Y
+                    };
 
                     DefaultForm.dPoints[i] = tmp;
                 }
@@ -1547,7 +1571,7 @@ namespace BezierTool
         }
 
 
-        // ???
+        // Calculate coordinates of graphical objects when the canva is zoomed.
         private void MakeZoomLists()
         {
             PointF tmp = new PointF();
@@ -1628,7 +1652,7 @@ namespace BezierTool
             cPointsAll.Add(null);
             pPointsAll.Add(null);
             movedCurve.Add(MoveType.Nothing);
-            curveColor.Add(lastColor);
+            curveColor.Add(defaultColor);
 
             if (curveType == BezierType.cPoints || curveType == BezierType.Composite || curveType == BezierType.LineSegment)
             {
@@ -2310,8 +2334,6 @@ namespace BezierTool
         // Change parametrization method and show the method being used now.
         private void ChangeParametrization()
         {
-            lblError.Text = "";
-
             int i = localPoint.Item1;
 
             ParamType paramType = parametrization[i];
@@ -2320,6 +2342,7 @@ namespace BezierTool
             {
                 lblError.ForeColor = Color.Red;
                 lblError.Text = "Error: <" + allCurves[i] + "> curves does not use parametrization!";
+                localPoint = null;
                 return;
             }
 
@@ -2344,49 +2367,76 @@ namespace BezierTool
         }
         
 
-        // ???
+        // Output points of an individual curve.
         private void OutputPointsToFile(List<PointF> pointList)
         {
             int i = localPoint.Item1;
-            string folderPath = "";
+            string path = "";
+            string type = "";
 
-            if (outputPointType == BezierType.cPoints)
-            {
-                pointList = cPointsAll[i];
-            }
-            else
-            {
-                pointList = pPointsAll[i];
-            }
 
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Filter = "txt files|*.txt",
+                Title = "Export All Objects",
+                FileName = "BezierTool"
+            };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                folderPath = dialog.SelectedPath;
+                if (dialog.FileName != "")
+                {
+                    FileStream fs = File.Create(dialog.FileName);
+                    path = Path.Combine(Path.GetDirectoryName(dialog.FileName), dialog.FileName);
+                    fs.Close();
+                }
             }
 
             else
             {
                 lblError.ForeColor = Color.Red;
                 lblError.Text = "Error: Output error!";
+                return;
             }
 
-            string path = Path.Combine(folderPath, "points.txt");
-            using (var file = new StreamWriter(path, true))
+            if (outputPointType == BezierType.cPoints)
             {
-                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")); // write date and time in the first line
-                file.WriteLine("<" + allCurves[i] + "> curve: \n");
+                type = "C";
+            }
+
+            else
+            {
+                type = "P";
+            }
+
+
+            using (var file = new StreamWriter(path))
+            {
+                file.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "\n");
+
+                file.WriteLine("<" + allCurves[i] + ">:");
+
+                if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares)
+                {
+                    file.WriteLine("" + parametrization[i]);
+                }
+
+                if (allCurves[i] == BezierType.Composite)
+                {
+                    file.WriteLine("" + movedCurve[i]);
+                }
+
+                file.WriteLine();
 
                 for (int j = 0; j < pointList.Count; j++)
                 {
-                    float scaledX = (pointList[j].X + shiftVector.X) * scalePropX;
-                    float scaledY = (pointList[j].Y + shiftVector.Y) * scalePropY;
+                    double scaledX = Math.Round((pointList[j].X + shiftVector.X) * scalePropX, 4);
+                    double scaledY = Math.Round((pointList[j].Y + shiftVector.Y) * scalePropY, 4);
 
-                    string line = "C" + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
+                    string line = type + (j + 1) + ": (" + scaledX + "; " + scaledY + ")"; // in each line write coordinates of one control point
                     file.WriteLine(line);
                 }
 
-                file.WriteLine("\n \n");
+                file.Close();
             }
         }
 

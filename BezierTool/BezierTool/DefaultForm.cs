@@ -16,17 +16,30 @@ namespace BezierTool
         public static int curveSize = 1;
         public static int polygonSize = 1;
         public static int pointSize = 2;
+        int maxCanvaSize = 500;
+
+        List<TextBox> textBoxes = new List<TextBox>();
 
         int maxLineSize = 20;
         int maxPointSize = 5;
 
+
+        // Initialization.
         public DefaultForm()
         {
             InitializeComponent();
             txtCurveSize.Text = "" + curveSize;
             txtPolygonSize.Text = "" + polygonSize;
+
+            textBoxes.Add(txtPolygonSize);
+            textBoxes.Add(txtCurveSize);
+            textBoxes.Add(txtPointSize);
+            textBoxes.Add(txtCanvaWidth);
+            textBoxes.Add(txtCanvaHeight);
         }
 
+
+        // Add default points from a .txt file.
         private void btndPointsAdd_Click(object sender, EventArgs e)
         {
             PointF point = new PointF();
@@ -88,9 +101,11 @@ namespace BezierTool
             {
                 for (int i = 0; i < dPoints.Count; i++)
                 {
-                    PointF tmp = new PointF();
-                    tmp.X = dPoints[i].X / FormMain.scalePropX - FormMain.shiftVector.X;
-                    tmp.Y = dPoints[i].Y / FormMain.scalePropY - FormMain.shiftVector.Y;
+                    PointF tmp = new PointF
+                    {
+                        X = dPoints[i].X / FormMain.scalePropX - FormMain.shiftVector.X,
+                        Y = dPoints[i].Y / FormMain.scalePropY - FormMain.shiftVector.Y
+                    };
 
                     dPoints[i] = tmp;
                 }
@@ -98,6 +113,16 @@ namespace BezierTool
 
         }
 
+
+        // Enable option to set scale of the canva.
+        private void btnSetScale_Click(object sender, EventArgs e)
+        {
+            FormMain.isSettingScale = true;
+            this.Close();
+        }
+
+
+        // Set color of default points.
         private void btndPointColor_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -106,6 +131,8 @@ namespace BezierTool
             }
         }
 
+
+        // Set color of control points.
         private void btncPointColor_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -114,6 +141,8 @@ namespace BezierTool
             }
         }
 
+
+        // Set color of knot points.
         private void btnpPointColor_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -122,12 +151,38 @@ namespace BezierTool
             }
         }
 
+
+        // Set color of polygon lines.
+        private void btnPolygon_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                polygonColor = colorDialog1.Color;
+            }
+        }
+
+
+        // Set color of curve lines.
+        private void btnCurveColor_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                FormMain.defaultColor = colorDialog1.Color;
+            }
+        }
+
+
+        // Submit changes in textboxes and close this window.
         private void btnOK_Click(object sender, EventArgs e)
         {
-            if (txtCurveSize.Text == "" || txtPolygonSize.Text == "")
+            foreach (TextBox textBox in textBoxes)
             {
-                MessageBox.Show("Must fill all values!");
-                return;
+                if (textBox.Text == "")
+                {
+                    MessageBox.Show("Must fill all values!");
+                    return;
+                }
+
             }
 
             if (Convert.ToInt32(txtCurveSize.Text) > maxLineSize  || Convert.ToInt32(txtPolygonSize.Text) > maxLineSize)
@@ -143,36 +198,21 @@ namespace BezierTool
                 return;
             }
 
+            if (Convert.ToSingle(txtCanvaWidth.Text) > maxCanvaSize || Convert.ToSingle(txtCanvaHeight.Text) > maxCanvaSize)
+            {
+                MessageBox.Show("Maximum size of Canva is " + maxCanvaSize + "x" + maxCanvaSize+" cm!");
+                return;
+            }
+            
+
             curveSize = Convert.ToInt32(txtCurveSize.Text);
             polygonSize = Convert.ToInt32(txtPolygonSize.Text);
             pointSize = Convert.ToInt32(txtPointSize.Text);
+            FormMain.canvaWidthCm = Convert.ToInt32(txtCanvaWidth.Text);
+            FormMain.canvaHeightCm = Convert.ToInt32(txtCanvaHeight.Text);
 
             this.Close();
         }
-
-        private void btnPolygon_Click(object sender, EventArgs e)
-        {
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
-            {
-                polygonColor = colorDialog1.Color;
-            }
-        }
-
-        public static void ResetAll()
-        {
-            dPoints = new List<PointF>();
-            dPointsColor = Color.Blue;
-            cPointsColor = Color.Red;
-            pPointsColor = Color.Black;
-            polygonColor = Color.LightGray;
-            curveSize = 1;
-            polygonSize = 1;
-        }
-
-        private void btnSetScale_Click(object sender, EventArgs e)
-        {
-            FormMain.isSettingScale = true;
-            this.Close();
-        }
+        
     }
 }
