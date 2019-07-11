@@ -66,7 +66,7 @@ namespace BezierTool
         public static float scalePropY = 1 / cmTOpx;
         public static PointF shiftVector = new PointF(- origin.X * cmTOpx, - origin.Y * cmTOpx);
         
-        public static Color defaultColor = Color.Black;
+        public static Color lastColor = Color.Black;
         List<Color> curveColor = new List<Color>();
 
         String imageLocation = ""; //path of background image
@@ -229,6 +229,9 @@ namespace BezierTool
                     curveColor[i] = colorDialog1.Color;
                 }
 
+                canChangeColor = false;
+                localPoint = null;
+
                 pbCanva.Invalidate();
             }
             
@@ -383,7 +386,7 @@ namespace BezierTool
                 DashPattern = new float[] { dashLength, dashLength },
                 Width = Math.Max(Convert.ToInt32(DefaultForm.polygonSize * zoomAmount), 1)
             };
-            Pen bezierPen = new Pen(defaultColor)
+            Pen bezierPen = new Pen(lastColor)
             {
                 Width = Math.Max(Convert.ToInt32(DefaultForm.curveSize * zoomAmount), 1)
             };
@@ -480,7 +483,7 @@ namespace BezierTool
                     {
                         AddcPointsInterpolation(i);
                     }
-
+                    
                     // draw <Composite> curve which hasn't been moved
                     if (allCurves[i] == BezierType.Composite && movedCurve[i] == MoveType.Nothing)
                     {
@@ -511,7 +514,7 @@ namespace BezierTool
 
                     if (allCurves[i] == BezierType.LineSegment && cPointsAll[i].Count == 2)
                     {
-                        e.Graphics.DrawLine(Pens.Black, cPointsZoom[i][0], cPointsZoom[i][1]);
+                        e.Graphics.DrawLine(bezierPen, cPointsZoom[i][0], cPointsZoom[i][1]);
                     }
 
 
@@ -1017,6 +1020,25 @@ namespace BezierTool
         }
         
 
+        // ???
+        private Color getColor(string text)
+        {
+            Color color = Color.Black;
+
+            if (text.Contains("#"))
+            {
+
+                color = ColorTranslator.FromHtml(text);
+            }
+            else
+            {
+                color = Color.FromName(text);
+            }
+
+            return color;
+        }
+        
+
         // Choose a .txt file and import settings and curves from it.
         private void btnImportAll_Click(object sender, EventArgs e)
         {
@@ -1132,10 +1154,13 @@ namespace BezierTool
                         else if (line.Contains("cPoints"))
                         {
                             listType = BezierType.cPoints;
+                            lastColor = getColor(file.ReadLine());
                         }
                         else if (line.Contains("pPoints"))
                         {
                             listType = BezierType.pPoints;
+                            lastColor = getColor(file.ReadLine());
+
                             subText = file.ReadLine();
                             if (subText == "Uniform")
                             {
@@ -1153,6 +1178,8 @@ namespace BezierTool
                         else if (line.Contains("LeastSquares"))
                         {
                             listType = BezierType.LeastSquares;
+                            lastColor = getColor(file.ReadLine());
+
                             subText = file.ReadLine();
                             if (subText == "Uniform")
                             {
@@ -1170,6 +1197,8 @@ namespace BezierTool
                         else if (line.Contains("Composite"))
                         {
                             listType = BezierType.Composite;
+                            lastColor = getColor(file.ReadLine());
+
                             subText = file.ReadLine();
                             if (subText == "Nothing")
                             {
@@ -1191,6 +1220,7 @@ namespace BezierTool
                         else if (line.Contains("LineSegment"))
                         {
                             listType = BezierType.LineSegment;
+                            lastColor = getColor(file.ReadLine());
                         }
 
                         if (line.Contains("<") && !line.Contains("dPoints"))
@@ -1237,6 +1267,7 @@ namespace BezierTool
                             if (listType == BezierType.Composite)
                             {
                                 movedCurve[movedCurve.Count - 1] = moveType;
+                                isCompositeDone = true;
                             }
 
                         }
@@ -1307,19 +1338,20 @@ namespace BezierTool
                             cPoints[i] = tmp;
                         }
 
-                        if (pPoints != null)
-                        {
-                            for (int i = 0; i < pPoints.Count; i++)
-                            {
-                                PointF tmp = new PointF();
-                                tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
-                                tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+                        cPointsAll[cPointsAll.Count - 1] = cPoints;
+                    }
 
-                                pPoints[i] = tmp;
-                            }
+                    if (pPoints != null)
+                    {
+                        for (int i = 0; i < pPoints.Count; i++)
+                        {
+                            PointF tmp = new PointF();
+                            tmp.X = pPoints[i].X / scalePropX - shiftVector.X;
+                            tmp.Y = pPoints[i].Y / scalePropY - shiftVector.Y;
+
+                            pPoints[i] = tmp;
                         }
 
-                        cPointsAll[cPointsAll.Count - 1] = cPoints;
                         pPointsAll[pPointsAll.Count - 1] = pPoints;
                     }
                 }
@@ -1392,6 +1424,14 @@ namespace BezierTool
                 for (int i = 0; i < allCurves.Count; i++)
                 {
                     file.WriteLine("<" + allCurves[i] + ">:");
+                    if (curveColor[i].IsNamedColor)
+                    {
+                        file.WriteLine("" + curveColor[i].Name);
+                    }
+                    else
+                    {
+                        file.WriteLine("#" + curveColor[i].Name);
+                    }
 
                     if (allCurves[i] == BezierType.pPoints || allCurves[i] == BezierType.LeastSquares)
                     {
@@ -1652,7 +1692,7 @@ namespace BezierTool
             cPointsAll.Add(null);
             pPointsAll.Add(null);
             movedCurve.Add(MoveType.Nothing);
-            curveColor.Add(defaultColor);
+            curveColor.Add(lastColor);
 
             if (curveType == BezierType.cPoints || curveType == BezierType.Composite || curveType == BezierType.LineSegment)
             {
@@ -1782,12 +1822,13 @@ namespace BezierTool
             // add three new control points for every knot point starting with the third -
             // - every knot point is also a control point and for every but first and last knot point, 
             // we get two handles:
-            for (int j = 2; j < pPointsAll[i].Count; j++)
+            for (int j = 2; j < pCount; j++)
             {
                 cPointsAll[i].Add(GetFirstHandle(pPointsAll[i][j - 2], pPointsAll[i][j - 1], pPointsAll[i][j]));
                 cPointsAll[i].Add(pPointsAll[i][j - 1]);
                 cPointsAll[i].Add(GetSecondHandle(pPointsAll[i][j - 2], pPointsAll[i][j - 1], pPointsAll[i][j]));
             }
+            
 
             // every <Composite> curve except the last one always needs to be finished
             // that means, it should have three times (every point is a control point and has two handles) 
@@ -1797,7 +1838,7 @@ namespace BezierTool
                 PointF veryLastHandle;
                 veryLastHandle = GetVeryLastHandle(pPointsAll[i][pCount - 2], cPointsAll[i][cPointsAll[i].Count - 1], pPointsAll[i][pCount - 1]);
                 cPointsAll[i].Add(veryLastHandle);
-                cPointsAll[i].Add(pPointsAll[i][pPointsAll[i].Count - 1]);
+                cPointsAll[i].Add(pPointsAll[i][pCount - 1]);
             }
 
             return;
@@ -2450,6 +2491,17 @@ namespace BezierTool
                 cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
                 return cp;
             }
+        }
+
+
+        // ???
+        private void pnlLastColor_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                lastColor = colorDialog1.Color;
+            }
+            pnlLastColor.BackColor = lastColor;
         }
 
 

@@ -67,6 +67,7 @@
             this.nudZoom = new System.Windows.Forms.NumericUpDown();
             this.cbShowcPoints = new System.Windows.Forms.CheckBox();
             this.panel_tools = new System.Windows.Forms.Panel();
+            this.pnlLastColor = new System.Windows.Forms.Panel();
             this.btnNewSegment = new System.Windows.Forms.Button();
             this.btnDeleteObject = new System.Windows.Forms.Button();
             this.btnChangeColor = new System.Windows.Forms.Button();
@@ -530,6 +531,7 @@
             // 
             // panel_tools
             // 
+            this.panel_tools.Controls.Add(this.pnlLastColor);
             this.panel_tools.Controls.Add(this.cbShowcPoints);
             this.panel_tools.Controls.Add(this.btnUploadBackground);
             this.panel_tools.Controls.Add(this.cbShowBackground);
@@ -547,6 +549,15 @@
             this.panel_tools.Name = "panel_tools";
             this.panel_tools.Size = new System.Drawing.Size(330, 699);
             this.panel_tools.TabIndex = 32;
+            // 
+            // pnlLastColor
+            // 
+            this.pnlLastColor.BackColor = System.Drawing.Color.Black;
+            this.pnlLastColor.Location = new System.Drawing.Point(180, 534);
+            this.pnlLastColor.Name = "pnlLastColor";
+            this.pnlLastColor.Size = new System.Drawing.Size(143, 36);
+            this.pnlLastColor.TabIndex = 42;
+            this.pnlLastColor.Click += new System.EventHandler(this.pnlLastColor_Click);
             // 
             // btnNewSegment
             // 
@@ -572,9 +583,9 @@
             // 
             this.btnChangeColor.Location = new System.Drawing.Point(9, 533);
             this.btnChangeColor.Name = "btnChangeColor";
-            this.btnChangeColor.Size = new System.Drawing.Size(314, 37);
+            this.btnChangeColor.Size = new System.Drawing.Size(159, 37);
             this.btnChangeColor.TabIndex = 36;
-            this.btnChangeColor.Text = "Choose Object to Change Color";
+            this.btnChangeColor.Text = "Change Color";
             this.btnChangeColor.UseVisualStyleBackColor = true;
             this.btnChangeColor.Click += new System.EventHandler(this.btnChangeColor_Click);
             // 
@@ -730,6 +741,7 @@
         private System.Windows.Forms.Label lblOrigin;
         private System.Windows.Forms.Label lblyAxis;
         private System.Windows.Forms.Label lblxAxis;
+        private System.Windows.Forms.Panel pnlLastColor;
     }
 }
 
