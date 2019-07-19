@@ -608,9 +608,9 @@
             this.lblyAxis.BackColor = System.Drawing.Color.WhiteSmoke;
             this.lblyAxis.Location = new System.Drawing.Point(100, 806);
             this.lblyAxis.Name = "lblyAxis";
-            this.lblyAxis.Size = new System.Drawing.Size(27, 20);
+            this.lblyAxis.Size = new System.Drawing.Size(43, 20);
             this.lblyAxis.TabIndex = 3;
-            this.lblyAxis.Text = "(, )";
+            this.lblyAxis.Text = "(0, y)";
             // 
             // lblxAxis
             // 
@@ -618,9 +618,9 @@
             this.lblxAxis.BackColor = System.Drawing.Color.WhiteSmoke;
             this.lblxAxis.Location = new System.Drawing.Point(945, 90);
             this.lblxAxis.Name = "lblxAxis";
-            this.lblxAxis.Size = new System.Drawing.Size(27, 20);
+            this.lblxAxis.Size = new System.Drawing.Size(43, 20);
             this.lblxAxis.TabIndex = 2;
-            this.lblxAxis.Text = "(, )";
+            this.lblxAxis.Text = "(x, 0)";
             // 
             // lblOrigin
             // 

@@ -9,7 +9,7 @@ namespace BezierTool
     public partial class DefaultForm : Form
     {
         public static List<PointF> dPoints = new List<PointF>();
-        public static Color dPointsColor = Color.Green;
+        public static Color dPointsColor = Color.Black;
         public static Color cPointsColor = Color.Red;
         public static Color pPointsColor = Color.Black;
         public static Color polygonColor = Color.LightGray;
@@ -17,12 +17,11 @@ namespace BezierTool
         public static int polygonSize = 1;
         public static int pointSize = 2;
         int maxCanvaSize = 500;
-
-        List<TextBox> textBoxes = new List<TextBox>();
-
         int maxLineSize = 20;
         int maxPointSize = 5;
 
+        List<TextBox> textBoxes = new List<TextBox>();
+        
 
         // Initialization.
         public DefaultForm()
