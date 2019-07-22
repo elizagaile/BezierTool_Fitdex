@@ -166,7 +166,7 @@ namespace BezierTool
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
             {
-                FormMain.lastColor = colorDialog1.Color;
+                FormMain.nextColor = colorDialog1.Color;
             }
         }
 

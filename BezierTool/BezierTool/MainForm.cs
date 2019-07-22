@@ -66,7 +66,7 @@ namespace BezierTool
         public static float scalePropY = 1 / cmTOpx;
         public static PointF shiftVector = new PointF(- origin.X * cmTOpx, - origin.Y * cmTOpx);
         
-        public static Color lastColor = Color.Black;
+        public static Color nextColor = Color.Black;
         List<Color> curveColor = new List<Color>();
 
         String imageLocation = ""; //path of background image
@@ -454,7 +454,7 @@ namespace BezierTool
                 if (pPointsAll[i] != null)
                 {
                     // draw a black point for every point
-                    if (cbShowcPoints.Checked == true)
+                    if (cbShowConstruction.Checked == true)
                     {
                         foreach (PointF pPoint in pPointsZoom[i])
                         {
@@ -516,7 +516,7 @@ namespace BezierTool
                     // Drawing circles for control points:
 
                     // for <4 cPoints> and <Least Squares> curves draw all control points
-                    if ((allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares) && cbShowcPoints.Checked == true)
+                    if ((allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares) && cbShowConstruction.Checked == true)
                     {
                         foreach (PointF cPoint in cPointsZoom[i])
                         {
@@ -525,7 +525,7 @@ namespace BezierTool
                     }
                     
                     //for <4 pPoints> curves draw only middle control points, because end are also points knot points
-                    else if (allCurves[i] == BezierType.pPoints && cbShowcPoints.Checked == true)
+                    else if (allCurves[i] == BezierType.pPoints && cbShowConstruction.Checked == true)
                     {
                         e.Graphics.DrawEllipse(cPointBrush, cPointsZoom[i][1].X - pointRadius, cPointsZoom[i][1].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
                         e.Graphics.DrawEllipse(cPointBrush, cPointsZoom[i][2].X - pointRadius, cPointsZoom[i][2].Y - pointRadius, 2 * pointRadius, 2 * pointRadius);
@@ -533,7 +533,7 @@ namespace BezierTool
 
                     // for <Composite> curves draw only those control points which are not knot points -
                     // - every third knot point starting from the first is also a control point
-                    else if (allCurves[i] == BezierType.Composite && cbShowcPoints.Checked == true)
+                    else if (allCurves[i] == BezierType.Composite && cbShowConstruction.Checked == true)
                     {
                         for (int j = 0; j < cPointsAll[i].Count - 1; j++)
                         {
@@ -547,13 +547,13 @@ namespace BezierTool
 
                     //Drawing control point polygons / handle lines:
 
-                    if (cPointsAll[i].Count > 1 && cbShowcPoints.Checked == true && (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.pPoints))
+                    if (cPointsAll[i].Count > 1 && cbShowConstruction.Checked == true && (allCurves[i] == BezierType.cPoints || allCurves[i] == BezierType.LeastSquares || allCurves[i] == BezierType.pPoints))
                     {
                         e.Graphics.DrawLines(polygonBrush, cPointsZoom[i].ToArray());
                     }
 
                     //for <Composite> curves, draw only handle lines
-                    else if (allCurves[i] == BezierType.Composite && cbShowcPoints.Checked == true)
+                    else if (allCurves[i] == BezierType.Composite && cbShowConstruction.Checked == true)
                     {
                         for (int j = 0; j < cPointsAll[i].Count - 1; j++)
                         {
@@ -980,6 +980,17 @@ namespace BezierTool
         }
 
 
+        // Set color of the next object to be drawn
+        private void pnlLastColor_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                nextColor = colorDialog1.Color;
+            }
+            pnlNextColor.BackColor = nextColor;
+        }
+
+
         // Enable ehe option to output control point coordinates.
         private void btnOutputcPoints_Click(object sender, EventArgs e)
         {
@@ -995,25 +1006,6 @@ namespace BezierTool
             ButtonPress();
 
             outputPointType = BezierType.pPoints;
-        }
-        
-
-        // ???
-        private Color getColor(string text)
-        {
-            Color color = Color.Black;
-
-            if (text.Contains("#"))
-            {
-
-                color = ColorTranslator.FromHtml(text);
-            }
-            else
-            {
-                color = Color.FromName(text);
-            }
-
-            return color;
         }
         
 
@@ -1279,7 +1271,12 @@ namespace BezierTool
 
                             else if (pointType == BezierType.dPoints)
                             {
-                                DefaultForm.dPoints.Add(point);
+                                PointF tmp = new PointF
+                                {
+                                    X = point.X / scalePropX - shiftVector.X,
+                                    Y = point.Y / scalePropY - shiftVector.Y
+                                };
+                                DefaultForm.dPoints.Add(tmp);
                             }
                         }
                     }
@@ -1482,7 +1479,7 @@ namespace BezierTool
             rbMouseModify.Checked = true;
             rbUniform.Checked = true;
             cbShowBackground.Checked = false;
-            cbShowcPoints.Checked = true;
+            cbShowConstruction.Checked = true;
 
             FormMain_Resize(sender, e);
 
@@ -1648,7 +1645,7 @@ namespace BezierTool
             cPointsAll.Add(null);
             pPointsAll.Add(null);
             movedCurve.Add(MoveType.Nothing);
-            curveColor.Add(lastColor);
+            curveColor.Add(nextColor);
             
 
             if (curveType == BezierType.pPoints || curveType == BezierType.LeastSquares)
@@ -2143,6 +2140,25 @@ namespace BezierTool
         }
 
 
+        // Get Color from a string
+        private Color getColor(string text)
+        {
+            Color color = Color.Black;
+
+            if (text.Contains("#"))
+            {
+
+                color = ColorTranslator.FromHtml(text);
+            }
+            else
+            {
+                color = Color.FromName(text);
+            }
+
+            return color;
+        }
+
+
         // Modify coordinates of a chosen control point.
         private void ModifycPoint(MouseEventArgs e)
         {
@@ -2444,17 +2460,6 @@ namespace BezierTool
                 cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
                 return cp;
             }
-        }
-
-
-        // ???
-        private void pnlLastColor_Click(object sender, EventArgs e)
-        {
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
-            {
-                lastColor = colorDialog1.Color;
-            }
-            pnlLastColor.BackColor = lastColor;
         }
         
     }
